@@ -21,12 +21,19 @@ document.querySelectorAll('[data-nav] a').forEach(link => {
 })
 
 const reveal = new IntersectionObserver(entries => {
-  entries.forEach(entry => entry.isIntersecting && entry.target.classList.add('revealed'))
+  entries.forEach(entry => {
+    if (!entry.isIntersecting) return
+    entry.target.classList.add('revealed')
+    reveal.unobserve(entry.target)
+  })
 }, { threshold: 0.12 })
 document.querySelectorAll('[data-reveal]').forEach(element => reveal.observe(element))
 
+const moneyFormatter = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' })
+const dateFormatter = new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' })
+
 function money(cents) {
-  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(cents / 100)
+  return moneyFormatter.format(cents / 100)
 }
 
 function escapeHtml(value = '') {
@@ -35,7 +42,7 @@ function escapeHtml(value = '') {
 
 function displayDate(value) {
   if (!value) return ''
-  return new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' }).format(new Date(`${value}T12:00:00Z`))
+  return dateFormatter.format(new Date(`${value}T12:00:00Z`))
 }
 
 window.PatioUtils = { money, escapeHtml, displayDate }
