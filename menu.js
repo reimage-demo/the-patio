@@ -12,23 +12,30 @@ const convexClient = window.PATIO_CONFIG?.convexUrl && window.PatioConvex
   : null
 let menu = []
 let menuSignature = ''
+let activeCategory = 'All'
 let checkoutRequestId = null
 const subscriptions = []
 
 function renderMenu() {
   const available = menu.filter(item => item.isAvailable)
   const categories = [...new Set(available.map(item => item.category || 'Menu'))]
-  categoryNav.innerHTML = categories.map((category, index) => `<a href="#menu-category-${index}">${escapeHtml(category)}</a>`).join('')
-  menuGrid.innerHTML = available.length ? categories.map((category, categoryIndex) => `
-    <section class="menu-category" id="menu-category-${categoryIndex}">
-      <div class="menu-category-heading"><div><p>Explore</p><h2>${escapeHtml(category)}</h2></div><span>${available.filter(item => (item.category || 'Menu') === category).length} items</span></div>
-      <div class="menu-items-grid">${available.filter(item => (item.category || 'Menu') === category).map(item => `
+  if (activeCategory !== 'All' && !categories.includes(activeCategory)) activeCategory = 'All'
+  const filters = ['All', ...categories]
+  categoryNav.innerHTML = filters.map(category => `<button type="button" class="${category === activeCategory ? 'active' : ''}" data-category="${escapeHtml(category)}" aria-pressed="${category === activeCategory}">${escapeHtml(category)}</button>`).join('')
+  const visible = activeCategory === 'All' ? available : available.filter(item => (item.category || 'Menu') === activeCategory)
+  menuGrid.innerHTML = visible.length ? `<div class="menu-items-grid">${visible.map(item => `
         <article class="menu-card">
-          <div class="menu-card-media">${item.imageUrl ? `<img src="${escapeHtml(item.imageUrl)}" width="800" height="600" loading="lazy" decoding="async" alt="${escapeHtml(item.name)}">` : `<div class="menu-photo-placeholder"><span>${escapeHtml(item.accent || category)}</span><strong>${escapeHtml(item.name.charAt(0))}</strong></div>`}</div>
-          <div class="menu-card-body"><div class="menu-card-top"><h3>${escapeHtml(item.name)}</h3><span class="menu-card-price">${money(item.price)}</span></div><p>${escapeHtml(item.description)}</p><div class="menu-card-actions"><span class="menu-tag">${escapeHtml(item.accent || category)}</span><button class="add-button" data-add="${item._id}" aria-label="Add ${escapeHtml(item.name)} to cart"><span>Add</span><b>+</b></button></div></div>
-        </article>`).join('')}</div>
-    </section>`).join('') : '<div class="empty-state">The online menu is being updated. Please check back shortly.</div>'
+          <div class="menu-card-media">${item.imageUrl ? `<img src="${escapeHtml(item.imageUrl)}" width="800" height="600" loading="lazy" decoding="async" alt="${escapeHtml(item.name)}">` : '<div class="menu-photo-placeholder"><span>Photo coming soon</span></div>'}<button class="add-button" data-add="${item._id}" aria-label="Add ${escapeHtml(item.name)} to cart">+</button></div>
+          <div class="menu-card-body"><div class="menu-card-top"><h3>${escapeHtml(item.name)}</h3><span class="menu-card-price">${money(item.price)}</span></div><p>${escapeHtml(item.description)}</p></div>
+        </article>`).join('')}</div>` : '<div class="empty-state">No drinks are available in this category right now.</div>'
 }
+
+categoryNav.addEventListener('click', event => {
+  const button = event.target.closest('[data-category]')
+  if (!button) return
+  activeCategory = button.dataset.category
+  renderMenu()
+})
 
 menuGrid.addEventListener('click', event => {
   const button = event.target.closest('[data-add]')
@@ -124,7 +131,7 @@ document.querySelector('#checkoutForm').addEventListener('submit', async event =
     window.location.assign(result.checkoutUrl)
   } catch (error) {
     message.className = 'form-message error'; message.textContent = error?.data?.message || 'We could not open secure checkout. Please try again.'
-  } finally { button.disabled = false; button.innerHTML = 'Pay securely with Clover <span>→</span>' }
+  } finally { button.disabled = false; button.textContent = 'Pay securely with Clover' }
 })
 
 const paymentResult = new URLSearchParams(window.location.search).get('payment')

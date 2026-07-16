@@ -10,7 +10,7 @@ const statusCopy = {
 }
 
 function render(orders) {
-  if (!orders.length) { board.innerHTML = '<div class="status-empty"><span>✓</span><h3>The board is clear.</h3><p>New paid orders will appear here automatically.</p><a href="menu.html">Browse the menu →</a></div>'; return }
+  if (!orders.length) { board.innerHTML = '<div class="status-empty"><span>✓</span><h3>The board is clear.</h3><p>New paid orders will appear here automatically.</p><a href="menu.html">Browse the menu</a></div>'; return }
   board.innerHTML = orders.map(order => { const state = statusCopy[order.status] || statusCopy.received; return `
     <article class="status-order-card status-step-${state.step}">
       <div class="status-order-head"><span>${escapeHtml(order.orderNumber)}</span><strong>${escapeHtml(state.label)}</strong></div>

@@ -1,4 +1,115 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Check the live status of your Patio pickup order."><title>Order Status | The Patio Hartford</title><link rel="icon" href="assets/logo-400.webp"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;1,600;1,700&display=swap" rel="stylesheet"><link rel="stylesheet" href="styles.css?v=20260715-3"></head>
-<body data-page="status"><header class="site-header"><a class="brand" href="index.html"><img src="assets/logo-400.webp" width="400" height="280" alt="The Patio"></a><button class="menu-toggle" data-menu-toggle aria-label="Open navigation" aria-expanded="false"><span></span><span></span><span></span></button><nav class="main-nav" data-nav><a data-page="home" href="index.html">Home</a><a data-page="menu" href="menu.html">Menu</a><a data-page="events" href="events.html">Events</a><a data-page="status" href="order-status.html">Order Status</a><a data-page="contact" href="contact.html">Contact Us</a></nav></header>
-<main><section class="status-hero"><div><p class="eyebrow">Live from the bar</p><h1>Your order,<br><em>right on cue.</em></h1><p>Paid orders appear here automatically. Keep this page open—updates arrive live.</p></div><div class="status-live-card"><span class="live-dot"></span><div><strong>Live updates on</strong><small>No refreshing needed</small></div></div></section><section class="status-page"><div class="status-page-heading"><div><p class="eyebrow dark">Pickup board</p><h2>What’s happening now</h2></div><a href="menu.html">Place another order <span>→</span></a></div><div class="status-steps" aria-hidden="true"><div><b>1</b><span>Payment confirmed</span></div><i></i><div><b>2</b><span>Being prepared</span></div><i></i><div><b>3</b><span>Ready for pickup</span></div></div><div class="status-board-modern" id="orderBoard"><div class="loading-card">Connecting to the bar…</div></div><p class="status-privacy">Only first names and order numbers are shown. Bring your valid photo ID for alcoholic beverages.</p></section></main>
-<footer class="site-footer"><div class="footer-brand"><img src="assets/logo-400.webp" width="400" height="280" alt="The Patio"><p>Sit long. Talk much. Laugh often.</p></div><div><p class="footer-label">Explore</p><a href="events.html">Events</a><a href="menu.html">Menu & ordering</a><a href="order-status.html">Order status</a><a href="contact.html">Contact</a></div><div><p class="footer-label">Visit</p><p>Main Street<br>Hartford, CT</p><p>Open daily at 9 AM</p></div><p class="footer-bottom">© 2026 The Patio. All rights reserved. <span>Enjoy responsibly.</span></p></footer><div class="cart-toast" id="statusToast" role="status" aria-live="polite"></div><script src="config.js?v=20260709-3" defer></script><script src="vendor/convex-client.js?v=20260715-2" defer></script><script src="shared.js?v=20260715-2" defer></script><script src="order-status.js?v=20260715-1" defer></script></body></html>
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta
+      name="description"
+      content="Check the live status of your Patio pickup order."
+    />
+    <title>Order Status | The Patio Hartford</title>
+    <link rel="icon" href="assets/logo-400.webp" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Sora:wght@500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css?v=20260715-12" />
+  </head>
+  <body data-page="status">
+    <header class="site-header">
+      <a class="brand" href="index.html"
+        ><img
+          src="assets/logo-400.webp"
+          width="400"
+          height="280"
+          alt="The Patio" /></a
+      ><button
+        class="menu-toggle"
+        data-menu-toggle
+        aria-label="Open navigation"
+        aria-expanded="false"
+      >
+        <span></span><span></span><span></span>
+      </button>
+      <nav class="main-nav" data-nav>
+        <a data-page="home" href="index.html">Home</a
+        ><a data-page="menu" href="menu.html">Menu</a
+        ><a data-page="events" href="events.html">Events</a
+        ><a data-page="status" href="order-status.html">Order Status</a
+        ><a data-page="contact" href="contact.html">Contact Us</a>
+      </nav>
+    </header>
+    <main>
+      <section class="status-hero">
+        <div>
+          <p class="eyebrow">Order status</p>
+          <h1>Your order,<br /><em>right on cue.</em></h1>
+          <p>
+            Paid orders appear here automatically and update without refreshing.
+            Keep this page open while the bar prepares your order.
+          </p>
+        </div>
+      </section>
+      <section class="status-page">
+        <div class="status-page-heading">
+          <div>
+            <p class="eyebrow dark">Pickup board</p>
+            <h2>What’s happening now</h2>
+          </div>
+          <a href="menu.html">Place another order</a>
+        </div>
+        <div class="status-steps" aria-hidden="true">
+          <div><b>1</b><span>Payment confirmed</span></div>
+          <i></i>
+          <div><b>2</b><span>Being prepared</span></div>
+          <i></i>
+          <div><b>3</b><span>Ready for pickup</span></div>
+        </div>
+        <div class="status-board-modern" id="orderBoard">
+          <div class="loading-card">Connecting to the bar…</div>
+        </div>
+        <p class="status-privacy">
+          Only first names and order numbers are shown. Bring your valid photo
+          ID for alcoholic beverages.
+        </p>
+      </section>
+    </main>
+    <footer class="site-footer">
+      <div class="footer-brand">
+        <img
+          src="assets/logo-400.webp"
+          width="400"
+          height="280"
+          alt="The Patio"
+        />
+        <p>Sit long. Talk much. Laugh often.</p>
+      </div>
+      <div>
+        <p class="footer-label">Explore</p>
+        <a href="events.html">Events</a><a href="menu.html">Menu & ordering</a
+        ><a href="order-status.html">Order status</a
+        ><a href="contact.html">Contact</a>
+      </div>
+      <div>
+        <p class="footer-label">Visit</p>
+        <p>Main Street<br />Hartford, CT</p>
+        <p>Open daily at 9 AM</p>
+      </div>
+      <p class="footer-bottom">
+        © 2026 The Patio. All rights reserved. <span>Enjoy responsibly.</span>
+      </p>
+    </footer>
+    <div
+      class="cart-toast"
+      id="statusToast"
+      role="status"
+      aria-live="polite"
+    ></div>
+    <script src="config.js?v=20260709-3" defer></script>
+    <script src="vendor/convex-client.js?v=20260715-2" defer></script>
+    <script src="shared.js?v=20260715-6" defer></script>
+    <script src="order-status.js?v=20260715-2" defer></script>
+  </body>
+</html>
