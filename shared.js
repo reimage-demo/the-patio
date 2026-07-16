@@ -100,6 +100,7 @@
     consentBanner.setAttribute("role", "dialog");
     consentBanner.setAttribute("aria-label", "Cookie choices");
     consentBanner.setAttribute("aria-live", "polite");
+    consentBanner.setAttribute("hidden", "");
     consentBanner.innerHTML =
       '<div><h2>Your privacy choices</h2><p>We use necessary browser storage to operate this website and remember your preference. We do not currently use analytics or advertising cookies. <a href="cookie-policy.html">Read the cookie policy</a>.</p></div><div class="cookie-actions"><button type="button" class="cookie-deny" data-cookie-choice="denied">Deny optional cookies</button><button type="button" class="cookie-accept" data-cookie-choice="accepted">Accept optional cookies</button></div>';
     document.body.append(consentBanner);
