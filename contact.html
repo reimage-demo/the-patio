@@ -5,9 +5,26 @@
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <meta
       name="description"
-      content="Contact and visit The Patio on Main Street in Hartford, Connecticut."
+      content="Find The Patio at 2280 Main Street, Hartford, CT 06120. Get directions, view daily hours, contact us or book our indoor-outdoor event space."
     />
-    <title>Contact | The Patio Hartford</title>
+    <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1" />
+    <meta name="geo.region" content="US-CT" />
+    <meta name="geo.placename" content="Hartford" />
+    <meta name="theme-color" content="#07130d" />
+    <title>Contact &amp; Directions | The Patio Hartford, CT</title>
+    <link rel="canonical" href="https://www.thepatiohartford.com/contact.html" />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:site_name" content="The Patio" />
+    <meta property="og:title" content="Contact &amp; Directions | The Patio Hartford" />
+    <meta property="og:description" content="Visit The Patio at 2280 Main Street, Hartford, CT 06120. Find directions, hours and contact information." />
+    <meta property="og:url" content="https://www.thepatiohartford.com/contact.html" />
+    <meta property="og:image" content="https://www.thepatiohartford.com/assets/images/patio-pink.jpg" />
+    <meta property="og:image:alt" content="Garden lounge seating and flowers at The Patio" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Contact &amp; Directions | The Patio Hartford" />
+    <meta name="twitter:description" content="Visit us at 2280 Main Street, Hartford, CT 06120." />
+    <meta name="twitter:image" content="https://www.thepatiohartford.com/assets/images/patio-pink.jpg" />
     <link rel="icon" href="assets/logo-400.webp" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -15,7 +32,30 @@
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Sora:wght@500;600;700;800&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="styles.css?v=20260715-12" />
+    <link rel="stylesheet" href="styles.css?v=20260716-3" />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "ContactPage",
+        "name": "Contact and directions to The Patio",
+        "url": "https://www.thepatiohartford.com/contact.html",
+        "mainEntity": { "@id": "https://www.thepatiohartford.com/#business" },
+        "about": {
+          "@type": "BarOrPub",
+          "@id": "https://www.thepatiohartford.com/#business",
+          "name": "The Patio",
+          "address": {
+            "@type": "PostalAddress",
+            "streetAddress": "2280 Main Street",
+            "addressLocality": "Hartford",
+            "addressRegion": "CT",
+            "postalCode": "06120",
+            "addressCountry": "US"
+          },
+          "hasMap": "https://www.google.com/maps/search/?api=1&query=2280+Main+St+Hartford+CT+06120"
+        }
+      }
+    </script>
   </head>
   <body data-page="contact">
     <header class="site-header">
@@ -49,31 +89,43 @@
     </header>
     <main class="contact-page">
       <section class="contact-intro">
-        <div data-reveal>
-          <p class="eyebrow">Come say hello</p>
-          <h1>Meet us<br /><em>on Main.</em></h1>
-          <p>
-            Questions about an event, the menu or your next visit? We’d love to
-            hear from you.
-          </p>
+        <div>
+          <p class="eyebrow">Contact &amp; directions</p>
+          <h1>Find us <em>in Hartford.</em></h1>
         </div>
-        <img
-          src="assets/images/patio-pink.jpg"
-          width="506"
-          height="675"
-          decoding="async"
-          alt="Pink flowers and lounge seating at The Patio"
-        />
+      </section>
+      <section class="contact-map" aria-labelledby="map-heading" data-reveal>
+        <iframe
+          title="Map showing The Patio at 2280 Main Street in Hartford, Connecticut"
+          src="https://www.google.com/maps?q=2280+Main+St,+Hartford,+CT+06120&amp;output=embed"
+          loading="lazy"
+          referrerpolicy="no-referrer-when-downgrade"
+          allowfullscreen
+        ></iframe>
+        <div>
+          <div>
+            <p class="eyebrow dark">Find your way here</p>
+            <h2 id="map-heading">Right here in <em>Hartford.</em></h2>
+            <p>2280 Main Street, Hartford, Connecticut 06120</p>
+          </div>
+          <a
+            class="button button-primary"
+            href="https://www.google.com/maps/dir/?api=1&amp;destination=2280+Main+St+Hartford+CT+06120"
+            target="_blank"
+            rel="noopener"
+            >Open directions</a
+          >
+        </div>
       </section>
       <section class="contact-cards" data-reveal>
         <article>
           <p class="footer-label">Visit</p>
-          <h2>Main Street<br />Hartford, CT</h2>
+          <h2>2280 Main Street<br />Hartford, CT 06120</h2>
           <a
-            href="https://maps.google.com/?q=Main+Street+Hartford+CT"
+            href="https://www.google.com/maps/dir/?api=1&amp;destination=2280+Main+St+Hartford+CT+06120"
             target="_blank"
             rel="noopener"
-            >Open in Maps</a
+            >Get directions</a
           >
         </article>
         <article>
@@ -124,7 +176,7 @@
       </div>
       <div>
         <p class="footer-label">Visit</p>
-        <p>Main Street<br />Hartford, CT</p>
+        <p>2280 Main Street<br />Hartford, CT 06120</p>
         <p>Open daily at 9 AM</p>
       </div>
       <div>

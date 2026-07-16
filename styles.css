@@ -415,6 +415,14 @@ h2 em {
 .hours-section > div:first-child > p:not(.eyebrow) {
   color: var(--muted);
 }
+.hours-section address {
+  margin: 18px 0;
+  color: var(--muted);
+  font-style: normal;
+}
+.hours-section address a:hover {
+  color: var(--green);
+}
 .hours-list {
   border-top: 1px solid var(--line);
 }
@@ -944,6 +952,36 @@ h2 em {
   font-size: 11px;
   font-weight: 700;
 }
+.contact-map {
+  padding: clamp(70px, 9vw, 120px) 6vw;
+  display: grid;
+  grid-template-columns: minmax(280px, 0.72fr) minmax(480px, 1.28fr);
+  gap: clamp(40px, 7vw, 95px);
+  align-items: center;
+  background: var(--paper);
+}
+.contact-map h2 {
+  margin: 0;
+  font:
+    600 clamp(44px, 5vw, 72px)/0.98 "Playfair Display",
+    serif;
+  letter-spacing: -0.04em;
+}
+.contact-map h2 em {
+  color: var(--green);
+}
+.contact-map p:not(.eyebrow) {
+  max-width: 430px;
+  margin: 24px 0;
+  color: var(--muted);
+}
+.contact-map iframe {
+  width: 100%;
+  min-height: 520px;
+  border: 0;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
 .contact-rental {
   padding: clamp(75px, 9vw, 125px) 7vw;
   display: flex;
@@ -1130,9 +1168,20 @@ h2 em {
 .events-section,
 .booking-banner,
 .contact-cards,
+.contact-map,
 .contact-rental {
   content-visibility: auto;
   contain-intrinsic-size: auto 800px;
+}
+
+@media (max-width: 760px) {
+  .contact-map {
+    grid-template-columns: 1fr;
+    padding: 65px 22px;
+  }
+  .contact-map iframe {
+    min-height: 420px;
+  }
 }
 
 /* Direct menu and events layouts */
@@ -4030,6 +4079,101 @@ body[data-page="menu"] .checkout-dialog[open] {
   position: fixed;
   inset: 0;
   margin: auto;
+}
+
+/* Compact contact flow: hero, map, then visit details */
+body[data-page="contact"] .contact-intro {
+  min-height: 150px;
+  height: 150px;
+  display: flex;
+  align-items: center;
+}
+body[data-page="contact"] .contact-intro > div {
+  width: 100%;
+  padding: 24px 6vw;
+}
+body[data-page="contact"] .contact-intro h1 {
+  margin: 0;
+  font-size: clamp(38px, 4vw, 56px);
+  line-height: 0.95;
+}
+body[data-page="contact"] .contact-map {
+  padding: 20px 6vw 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+body[data-page="contact"] .contact-map iframe {
+  min-height: 350px;
+  height: 350px;
+  border-radius: var(--radius) var(--radius) 0 0;
+}
+body[data-page="contact"] .contact-map > div {
+  width: 100%;
+  padding: 18px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  border: 1px solid var(--line);
+  border-top: 0;
+  border-radius: 0 0 var(--radius) var(--radius);
+  background: #fff;
+}
+body[data-page="contact"] .contact-map h2 {
+  font-size: clamp(28px, 2.8vw, 40px);
+}
+body[data-page="contact"] .contact-map p:not(.eyebrow) {
+  margin: 8px 0 0;
+}
+body[data-page="contact"] .contact-map .button {
+  flex: none;
+}
+body[data-page="contact"] .contact-cards {
+  padding: 0 6vw 55px;
+}
+body[data-page="contact"] .contact-cards article {
+  min-height: 210px;
+  padding: 28px;
+}
+body[data-page="contact"] .contact-cards h2 {
+  margin-top: 24px;
+}
+
+@media (max-width: 680px) {
+  body[data-page="contact"] .contact-intro {
+    min-height: 0;
+    height: 120px;
+  }
+  body[data-page="contact"] .contact-intro > div {
+    padding: 20px 22px;
+  }
+  body[data-page="contact"] .contact-intro h1 {
+    font-size: 36px;
+  }
+  body[data-page="contact"] .contact-map {
+    padding: 18px 18px 12px;
+  }
+  body[data-page="contact"] .contact-map iframe {
+    min-height: 280px;
+    height: 280px;
+  }
+  body[data-page="contact"] .contact-map > div {
+    padding: 20px;
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 18px;
+  }
+  body[data-page="contact"] .contact-map .button {
+    width: 100%;
+  }
+  body[data-page="contact"] .contact-cards {
+    padding: 0 18px 45px;
+  }
+  body[data-page="contact"] .contact-cards article {
+    min-height: 175px;
+    padding: 24px;
+  }
 }
 
 @media (max-width: 600px) {
