@@ -6,7 +6,8 @@ let unsubscribe
 const statusCopy = {
   received: { label: 'Payment confirmed', note: 'Your order is in the bar queue.', step: 1 },
   'in-progress': { label: 'Being prepared', note: 'The team is making it now.', step: 2 },
-  ready: { label: 'Ready for pickup', note: 'Head to the bar with your ID.', step: 3 }
+  ready: { label: 'Ready for pickup', note: 'Head to the bar with your ID.', step: 3 },
+  completed: { label: 'Ready for pickup', note: 'Head to the bar with your ID.', step: 3 }
 }
 
 function render(orders) {
