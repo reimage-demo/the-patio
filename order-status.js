@@ -26,4 +26,8 @@ if (new URLSearchParams(location.search).get('payment') === 'success') {
   const toast = document.querySelector('#statusToast'); toast.textContent = 'Payment submitted. Your order will appear as soon as Clover confirms it.'; toast.classList.add('show'); setTimeout(() => toast.classList.remove('show'), 7000)
 }
 
+if (new URLSearchParams(location.search).get('payment') === 'complimentary') {
+  const toast = document.querySelector('#statusToast'); toast.textContent = 'Your complimentary order was submitted and is now in progress.'; toast.classList.add('show'); setTimeout(() => toast.classList.remove('show'), 7000)
+}
+
 window.addEventListener('beforeunload', () => { unsubscribe?.(); convexClient?.close() })

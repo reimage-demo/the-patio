@@ -320,7 +320,7 @@ document
       return;
     }
     button.disabled = true;
-    button.textContent = "Opening Clover…";
+    button.textContent = "Submitting order…";
     message.textContent = "";
     const form = new FormData(event.currentTarget);
     try {
@@ -339,8 +339,13 @@ document
         })),
       });
       message.className = "form-message success";
-      message.textContent = `Opening secure checkout for ${result.orderNumber}…`;
-      window.location.assign(result.checkoutUrl);
+      if (result.complimentary) {
+        message.textContent = `Order ${result.orderNumber} submitted.`;
+        window.location.assign("order-status.html?payment=complimentary");
+      } else {
+        message.textContent = `Opening secure checkout for ${result.orderNumber}…`;
+        window.location.assign(result.checkoutUrl);
+      }
     } catch (error) {
       message.className = "form-message error";
       message.textContent =
