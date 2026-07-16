@@ -4081,6 +4081,127 @@ body[data-page="menu"] .checkout-dialog[open] {
   margin: auto;
 }
 
+/* High-volume pickup board: compact horizontal rows */
+body[data-page="status"] .status-page {
+  padding: 42px 4vw 55px;
+}
+body[data-page="status"] .status-page-heading,
+body[data-page="status"] .status-board-modern,
+body[data-page="status"] .status-privacy {
+  width: 100%;
+  max-width: 1500px;
+}
+body[data-page="status"] .status-steps {
+  max-width: 1120px;
+  margin: 30px auto;
+}
+body[data-page="status"] .status-board-modern {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 9px;
+}
+body[data-page="status"] .status-order-card {
+  min-height: 88px;
+  padding: 14px 18px;
+  display: grid;
+  grid-template-columns: 210px minmax(320px, 1fr) 180px 190px;
+  grid-template-areas: "head person track note";
+  align-items: center;
+  gap: 22px;
+  border-radius: 12px;
+  box-shadow: 0 5px 18px rgba(6, 31, 16, 0.045);
+}
+body[data-page="status"] .status-order-head {
+  grid-area: head;
+}
+body[data-page="status"] .status-order-head > span {
+  font-size: 10px;
+}
+body[data-page="status"] .status-order-person {
+  grid-area: person;
+  min-width: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: minmax(100px, 0.45fr) minmax(180px, 1.55fr);
+  grid-template-areas: "label items" "name items";
+  align-items: center;
+  column-gap: 18px;
+}
+body[data-page="status"] .status-order-person small {
+  grid-area: label;
+}
+body[data-page="status"] .status-order-person h3 {
+  grid-area: name;
+  margin: 1px 0 0;
+  font-size: 22px;
+  line-height: 1.05;
+}
+body[data-page="status"] .status-order-person p {
+  grid-area: items;
+  min-height: 0;
+  margin: 0;
+  overflow: hidden;
+  color: var(--ink);
+  font-size: 11px;
+  line-height: 1.35;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+body[data-page="status"] .status-order-track {
+  grid-area: track;
+}
+body[data-page="status"] .status-order-track i {
+  height: 6px;
+}
+body[data-page="status"] .status-order-note {
+  grid-area: note;
+  margin: 0;
+  font-size: 10px;
+  line-height: 1.35;
+}
+body[data-page="status"] .status-privacy {
+  margin-top: 16px;
+}
+
+@media (max-width: 1050px) {
+  body[data-page="status"] .status-order-card {
+    grid-template-columns: 190px minmax(0, 1fr);
+    grid-template-areas:
+      "head person"
+      "track note";
+    gap: 12px 20px;
+  }
+}
+
+@media (max-width: 680px) {
+  body[data-page="status"] .status-page {
+    padding: 38px 14px 45px;
+  }
+  body[data-page="status"] .status-page-heading h2 {
+    font-size: 38px;
+  }
+  body[data-page="status"] .status-steps {
+    margin: 26px 0;
+  }
+  body[data-page="status"] .status-order-card {
+    min-height: 0;
+    padding: 14px;
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "head"
+      "person"
+      "track"
+      "note";
+    gap: 11px;
+  }
+  body[data-page="status"] .status-order-person {
+    grid-template-columns: minmax(90px, 0.5fr) minmax(0, 1.5fr);
+  }
+  body[data-page="status"] .status-order-person p {
+    white-space: normal;
+  }
+}
+
 /* Compact contact flow: hero, map, then visit details */
 body[data-page="contact"] .contact-intro {
   min-height: 150px;
