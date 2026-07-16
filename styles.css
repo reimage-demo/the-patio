@@ -3268,6 +3268,148 @@ h3 em,
   font-style: normal;
 }
 
+/* Featured menu items and Drink of the Night */
+.menu-card-badge {
+  position: absolute;
+  z-index: 3;
+  top: 12px;
+  left: 12px;
+  padding: 7px 10px;
+  border-radius: 6px;
+  color: #fff;
+  background: rgba(7, 19, 13, 0.9);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.18);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.09em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+.menu-card-badge.night-badge {
+  color: #312200;
+  background: var(--yellow);
+}
+.menu-card-badge.custom-badge {
+  color: #fff;
+  background: #176b3d;
+}
+.customize-dialog {
+  width: min(720px, calc(100% - 28px));
+  max-height: min(88dvh, 850px);
+  overflow-y: auto;
+}
+.customize-description {
+  margin: -6px 0 22px;
+  color: var(--muted);
+}
+.customize-groups {
+  display: grid;
+  gap: 15px;
+}
+.customize-group {
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+.customize-group legend {
+  padding: 0 7px;
+  font-weight: 800;
+}
+.customize-group legend span {
+  margin-left: 8px;
+  color: var(--muted);
+  font-size: 9px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.customize-group > p {
+  margin: 0 0 10px;
+  color: var(--muted);
+  font-size: 11px;
+}
+.customize-group > div {
+  display: grid;
+  gap: 7px;
+}
+.customize-group label {
+  min-height: 52px;
+  margin: 0;
+  padding: 10px 11px;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 11px;
+  border-radius: 8px;
+  background: #f4f6f2;
+  cursor: pointer;
+}
+.customize-group input {
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  accent-color: var(--green);
+}
+.customize-group label span strong,
+.customize-group label span small {
+  display: block;
+}
+.customize-group label span small {
+  margin-top: 2px;
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 400;
+}
+.customize-group label b {
+  font-size: 11px;
+}
+.customize-group label:has(input:checked) {
+  outline: 2px solid var(--green);
+  background: #e8f4ec;
+}
+.customize-dialog .form-message {
+  min-height: 20px;
+  margin: 12px 0;
+}
+.cart-options {
+  color: #206b40 !important;
+  font-weight: 600;
+}
+.modern-menu .menu-card.drink-of-night {
+  padding: 8px 8px 12px;
+  border-radius: 22px;
+  background: #fff5d3;
+  box-shadow: 0 18px 42px rgba(91, 64, 0, 0.13);
+}
+.modern-menu .menu-card.drink-of-night:hover {
+  box-shadow: 0 20px 48px rgba(91, 64, 0, 0.18);
+}
+.modern-menu .menu-card.drink-of-night .menu-card-media {
+  outline: 3px solid var(--yellow);
+  outline-offset: -3px;
+}
+.modern-menu .menu-card.drink-of-night .menu-card-body {
+  padding-right: 8px;
+  padding-left: 8px;
+}
+.modern-menu .menu-card.drink-of-night h3 {
+  color: #6c4a00;
+}
+@media (max-width: 600px) {
+  .customize-dialog {
+    width: calc(100% - 16px);
+    max-height: 92dvh;
+    padding: 25px 16px 18px;
+  }
+  .customize-group {
+    padding: 13px 10px;
+  }
+  .customize-group legend span {
+    display: block;
+    margin: 3px 0 0;
+  }
+}
+
 /* Policy pages and cookie choices */
 .legal-links {
   grid-column: 1/4;

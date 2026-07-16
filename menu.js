@@ -1,149 +1,370 @@
-const { fallbackMenu } = window.PatioData
-const { escapeHtml, money } = window.PatioUtils
+const { fallbackMenu } = window.PatioData;
+const { escapeHtml, money } = window.PatioUtils;
 
-const menuGrid = document.querySelector('#menuGrid')
-const categoryNav = document.querySelector('#categoryNav')
-const drawer = document.querySelector('#cartDrawer')
-const dialog = document.querySelector('#checkoutDialog')
-const cartItemsElement = document.querySelector('#cartItems')
-const cart = new Map()
-const convexClient = window.PATIO_CONFIG?.convexUrl && window.PatioConvex
-  ? new window.PatioConvex.ConvexClient(window.PATIO_CONFIG.convexUrl)
-  : null
-let menu = []
-let menuSignature = ''
-let activeCategory = 'All'
-let checkoutRequestId = null
-const subscriptions = []
+const menuGrid = document.querySelector("#menuGrid");
+const categoryNav = document.querySelector("#categoryNav");
+const drawer = document.querySelector("#cartDrawer");
+const checkoutDialog = document.querySelector("#checkoutDialog");
+const customizeDialog = document.querySelector("#customizeDialog");
+const customizeForm = document.querySelector("#customizeForm");
+const customizeGroups = document.querySelector("#customizeGroups");
+const cartItemsElement = document.querySelector("#cartItems");
+const cart = new Map();
+const convexClient =
+  window.PATIO_CONFIG?.convexUrl && window.PatioConvex
+    ? new window.PatioConvex.ConvexClient(window.PATIO_CONFIG.convexUrl)
+    : null;
+let menu = [];
+let menuSignature = "";
+let activeCategory = "All";
+let checkoutRequestId = null;
+let customizingItemId = null;
+let toastTimer;
+const subscriptions = [];
 
 function renderMenu() {
-  const available = menu.filter(item => item.isAvailable)
-  const categories = [...new Set(available.map(item => item.category || 'Menu'))]
-  if (activeCategory !== 'All' && !categories.includes(activeCategory)) activeCategory = 'All'
-  const filters = ['All', ...categories]
-  categoryNav.innerHTML = filters.map(category => `<button type="button" class="${category === activeCategory ? 'active' : ''}" data-category="${escapeHtml(category)}" aria-pressed="${category === activeCategory}">${escapeHtml(category)}</button>`).join('')
-  const visible = activeCategory === 'All' ? available : available.filter(item => (item.category || 'Menu') === activeCategory)
-  menuGrid.innerHTML = visible.length ? `<div class="menu-items-grid">${visible.map(item => `
-        <article class="menu-card">
-          <div class="menu-card-media">${item.imageUrl ? `<img src="${escapeHtml(item.imageUrl)}" width="800" height="600" loading="lazy" decoding="async" alt="${escapeHtml(item.name)}">` : '<div class="menu-photo-placeholder"><span>Photo coming soon</span></div>'}<button class="add-button" data-add="${item._id}" aria-label="Add ${escapeHtml(item.name)} to cart">+</button></div>
-          <div class="menu-card-body"><div class="menu-card-top"><h3>${escapeHtml(item.name)}</h3><span class="menu-card-price">${money(item.price)}</span></div><p>${escapeHtml(item.description)}</p></div>
-        </article>`).join('')}</div>` : '<div class="empty-state">No drinks are available in this category right now.</div>'
+  const available = menu
+    .filter((item) => item.isAvailable)
+    .sort((left, right) => {
+      const leftRank = left.isDrinkOfNight ? 0 : left.isFeatured ? 1 : 2;
+      const rightRank = right.isDrinkOfNight ? 0 : right.isFeatured ? 1 : 2;
+      return (
+        leftRank - rightRank || (left.sortOrder || 0) - (right.sortOrder || 0)
+      );
+    });
+  const categories = [
+    ...new Set(available.map((item) => item.category || "Menu")),
+  ];
+  if (activeCategory !== "All" && !categories.includes(activeCategory))
+    activeCategory = "All";
+  categoryNav.innerHTML = ["All", ...categories]
+    .map(
+      (category) =>
+        `<button type="button" class="${category === activeCategory ? "active" : ""}" data-category="${escapeHtml(category)}" aria-pressed="${category === activeCategory}">${escapeHtml(category)}</button>`,
+    )
+    .join("");
+  const visible =
+    activeCategory === "All"
+      ? available
+      : available.filter(
+          (item) => (item.category || "Menu") === activeCategory,
+        );
+  menuGrid.innerHTML = visible.length
+    ? `<div class="menu-items-grid">${visible
+        .map((item) => {
+          const badge = item.isDrinkOfNight
+            ? '<span class="menu-card-badge night-badge">Drink of the Night</span>'
+            : item.isCustomDrink
+              ? '<span class="menu-card-badge custom-badge">Build Your Own</span>'
+              : item.isFeatured
+                ? '<span class="menu-card-badge">Featured</span>'
+                : "";
+          const priceLabel = item.isCustomDrink
+            ? `Starting at ${money(item.price)}`
+            : `${money(item.price)}${item.optionGroups?.some((group) => group.options.some((option) => option.price)) ? "+" : ""}`;
+          return `<article class="menu-card${item.isFeatured ? " is-featured" : ""}${item.isDrinkOfNight ? " drink-of-night" : ""}${item.isCustomDrink ? " custom-drink" : ""}"><div class="menu-card-media">${badge}${item.imageUrl ? `<img src="${escapeHtml(item.imageUrl)}" width="800" height="600" loading="lazy" decoding="async" alt="${escapeHtml(item.name)}">` : '<div class="menu-photo-placeholder"><span>Photo coming soon</span></div>'}<button class="add-button" data-add="${item._id}" aria-label="${item.optionGroups?.length ? "Customize" : "Add"} ${escapeHtml(item.name)}">+</button></div><div class="menu-card-body"><div class="menu-card-top"><h3>${escapeHtml(item.name)}</h3><span class="menu-card-price">${priceLabel}</span></div><p>${escapeHtml(item.description)}</p></div></article>`;
+        })
+        .join("")}</div>`
+    : '<div class="empty-state">No drinks are available in this category right now.</div>';
 }
 
-categoryNav.addEventListener('click', event => {
-  const button = event.target.closest('[data-category]')
-  if (!button) return
-  activeCategory = button.dataset.category
-  renderMenu()
-})
+categoryNav.addEventListener("click", (event) => {
+  const button = event.target.closest("[data-category]");
+  if (!button) return;
+  activeCategory = button.dataset.category;
+  renderMenu();
+});
 
-menuGrid.addEventListener('click', event => {
-  const button = event.target.closest('[data-add]')
-  if (button) changeQuantity(button.dataset.add, 1)
-})
+menuGrid.addEventListener("click", (event) => {
+  const button = event.target.closest("[data-add]");
+  if (!button) return;
+  const item = menu.find(
+    (row) => String(row._id) === String(button.dataset.add),
+  );
+  if (!item) return;
+  item.optionGroups?.length
+    ? openCustomizer(item)
+    : addConfiguredItem(item, []);
+});
 
+function configurationKey(itemId, selectedOptions) {
+  return `${itemId}:${
+    selectedOptions
+      .map((option) => `${option.groupId}.${option.optionId}`)
+      .sort()
+      .join("|") || "base"
+  }`;
+}
 function cartLines() {
-  return [...cart.entries()].map(([id, quantity]) => ({ item: menu.find(row => String(row._id) === String(id)), quantity })).filter(row => row.item)
+  return [...cart.entries()]
+    .map(([key, line]) => ({
+      key,
+      ...line,
+      item: menu.find((row) => String(row._id) === String(line.itemId)),
+    }))
+    .filter((line) => line.item);
+}
+function optionDetails(item, selectedOptions) {
+  return selectedOptions
+    .map((selection) => {
+      const group = item.optionGroups?.find(
+        (entry) => String(entry._id) === String(selection.groupId),
+      );
+      const option = group?.options.find(
+        (entry) => entry.id === selection.optionId,
+      );
+      return group && option
+        ? {
+            ...selection,
+            groupName: group.name,
+            name: option.name,
+            price: option.price,
+          }
+        : null;
+    })
+    .filter(Boolean);
+}
+function lineUnitPrice(item, selectedOptions) {
+  return (
+    item.price +
+    optionDetails(item, selectedOptions).reduce(
+      (sum, option) => sum + option.price,
+      0,
+    )
+  );
+}
+function addConfiguredItem(item, selectedOptions) {
+  const key = configurationKey(item._id, selectedOptions);
+  const existing = cart.get(key);
+  cart.set(key, {
+    itemId: item._id,
+    selectedOptions,
+    quantity: (existing?.quantity || 0) + 1,
+  });
+  checkoutRequestId = null;
+  renderCart();
+  showAdded(item._id);
+}
+function changeQuantity(key, delta) {
+  const line = cart.get(key);
+  if (!line) return;
+  const next = line.quantity + delta;
+  next > 0 ? cart.set(key, { ...line, quantity: next }) : cart.delete(key);
+  checkoutRequestId = null;
+  renderCart();
 }
 
-function changeQuantity(id, delta) {
-  const next = (cart.get(id) || 0) + delta
-  next > 0 ? cart.set(id, next) : cart.delete(id)
-  renderCart()
-  if (delta > 0 && !document.body.classList.contains('cart-open')) showAdded(id)
+function openCustomizer(item) {
+  customizingItemId = item._id;
+  document.querySelector("#customizeEyebrow").textContent = item.isCustomDrink
+    ? "Build Your Own"
+    : "Make it yours";
+  document.querySelector("#customizeTitle").textContent = item.name;
+  document.querySelector("#customizeDescription").textContent =
+    item.description;
+  customizeGroups.innerHTML = item.optionGroups
+    .map((group, groupIndex) => {
+      const inputType = group.selectionMode === "single" ? "radio" : "checkbox";
+      const requirement = group.minSelections
+        ? `Choose ${group.minSelections}${group.maxSelections > group.minSelections ? `–${group.maxSelections}` : ""}`
+        : `Optional · up to ${group.maxSelections}`;
+      return `<fieldset class="customize-group" data-group-id="${group._id}" data-min="${group.minSelections}" data-max="${group.selectionMode === "single" ? 1 : group.maxSelections}"><legend>${escapeHtml(group.name)} <span>${escapeHtml(requirement)}</span></legend>${group.description ? `<p>${escapeHtml(group.description)}</p>` : ""}<div>${group.options.map((option) => `<label><input type="${inputType}" name="option-group-${groupIndex}" value="${escapeHtml(option.id)}" data-price="${option.price}"><span><strong>${escapeHtml(option.name)}</strong>${option.description ? `<small>${escapeHtml(option.description)}</small>` : ""}</span><b>${option.price ? `+${money(option.price)}` : "Included"}</b></label>`).join("")}</div></fieldset>`;
+    })
+    .join("");
+  document.querySelector("#customizeMessage").textContent = "";
+  updateCustomizeTotal();
+  customizeDialog.showModal();
 }
+function chosenOptions() {
+  return [...customizeGroups.querySelectorAll(".customize-group")].flatMap(
+    (fieldset) =>
+      [...fieldset.querySelectorAll("input:checked")].map((input) => ({
+        groupId: fieldset.dataset.groupId,
+        optionId: input.value,
+      })),
+  );
+}
+function updateCustomizeTotal() {
+  const item = menu.find(
+    (row) => String(row._id) === String(customizingItemId),
+  );
+  if (!item) return;
+  document.querySelector("#addCustomized").textContent =
+    `Add to order · ${money(lineUnitPrice(item, chosenOptions()))}`;
+}
+customizeForm.addEventListener("input", updateCustomizeTotal);
+customizeForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+  const invalid = [
+    ...customizeGroups.querySelectorAll(".customize-group"),
+  ].find((fieldset) => {
+    const count = fieldset.querySelectorAll("input:checked").length;
+    return (
+      count < Number(fieldset.dataset.min) ||
+      count > Number(fieldset.dataset.max)
+    );
+  });
+  if (invalid) {
+    document.querySelector("#customizeMessage").textContent =
+      `Please complete ${invalid.querySelector("legend").childNodes[0].textContent.trim()}.`;
+    invalid.scrollIntoView({ behavior: "smooth", block: "center" });
+    return;
+  }
+  const item = menu.find(
+    (row) => String(row._id) === String(customizingItemId),
+  );
+  if (item) addConfiguredItem(item, chosenOptions());
+  customizeDialog.close();
+});
+document.querySelector("#closeCustomize").onclick = () =>
+  customizeDialog.close();
 
-let toastTimer
 function showAdded(id) {
-  const item = menu.find(row => String(row._id) === String(id))
-  const toast = document.querySelector('#cartToast')
-  toast.textContent = `${item?.name || 'Drink'} added to your cart`
-  toast.classList.add('show')
-  document.querySelector('#cartButton').classList.remove('cart-bump')
-  requestAnimationFrame(() => document.querySelector('#cartButton').classList.add('cart-bump'))
-  window.clearTimeout(toastTimer)
-  toastTimer = window.setTimeout(() => toast.classList.remove('show'), 1800)
+  const item = menu.find((row) => String(row._id) === String(id));
+  const toast = document.querySelector("#cartToast");
+  toast.textContent = `${item?.name || "Drink"} added to your cart`;
+  toast.classList.add("show");
+  document.querySelector("#cartButton").classList.remove("cart-bump");
+  requestAnimationFrame(() =>
+    document.querySelector("#cartButton").classList.add("cart-bump"),
+  );
+  window.clearTimeout(toastTimer);
+  toastTimer = window.setTimeout(() => toast.classList.remove("show"), 1800);
 }
-
 function renderCart() {
-  const lines = cartLines()
-  document.querySelector('#cartCount').textContent = lines.reduce((sum, line) => sum + line.quantity, 0)
-  const total = lines.reduce((sum, line) => sum + line.item.price * line.quantity, 0)
-  document.querySelector('#cartTotal').textContent = money(total)
-  document.querySelector('#cartPreviewTotal').textContent = money(total)
-  cartItemsElement.innerHTML = lines.length ? lines.map(({ item, quantity }) => `
-    <div class="cart-item">${item.imageUrl ? `<img src="${escapeHtml(item.imageUrl)}" width="64" height="64" alt="">` : '<span class="cart-item-placeholder">P</span>'}<div><h3>${escapeHtml(item.name)}</h3><p>${money(item.price)} each</p></div><div class="quantity"><button data-minus="${item._id}" aria-label="Remove one">−</button><span>${quantity}</span><button data-plus="${item._id}" aria-label="Add one">+</button></div></div>`).join('') : '<div class="cart-empty">Your cart is ready for something good.</div>'
+  const lines = cartLines();
+  const count = lines.reduce((sum, line) => sum + line.quantity, 0);
+  const total = lines.reduce(
+    (sum, line) =>
+      sum + lineUnitPrice(line.item, line.selectedOptions) * line.quantity,
+    0,
+  );
+  document.querySelector("#cartCount").textContent = count;
+  document.querySelector("#cartTotal").textContent = money(total);
+  document.querySelector("#cartPreviewTotal").textContent = money(total);
+  cartItemsElement.innerHTML = lines.length
+    ? lines
+        .map(({ key, item, selectedOptions, quantity }) => {
+          const options = optionDetails(item, selectedOptions);
+          return `<div class="cart-item">${item.imageUrl ? `<img src="${escapeHtml(item.imageUrl)}" width="64" height="64" alt="">` : '<span class="cart-item-placeholder">P</span>'}<div><h3>${escapeHtml(item.name)}</h3>${options.length ? `<p class="cart-options">${options.map((option) => escapeHtml(option.name)).join(" · ")}</p>` : ""}<p>${money(lineUnitPrice(item, selectedOptions))} each</p></div><div class="quantity"><button data-minus="${escapeHtml(key)}" aria-label="Remove one">−</button><span>${quantity}</span><button data-plus="${escapeHtml(key)}" aria-label="Add one">+</button></div></div>`;
+        })
+        .join("")
+    : '<div class="cart-empty">Your cart is ready for something good.</div>';
 }
+cartItemsElement.addEventListener("click", (event) => {
+  const minus = event.target.closest("[data-minus]");
+  const plus = event.target.closest("[data-plus]");
+  if (minus) changeQuantity(minus.dataset.minus, -1);
+  if (plus) changeQuantity(plus.dataset.plus, 1);
+});
 
-cartItemsElement.addEventListener('click', event => {
-  const minus = event.target.closest('[data-minus]')
-  const plus = event.target.closest('[data-plus]')
-  if (minus) changeQuantity(minus.dataset.minus, -1)
-  if (plus) changeQuantity(plus.dataset.plus, 1)
-})
-
-function openCart() { document.body.classList.add('cart-open'); drawer.setAttribute('aria-hidden', 'false') }
-function closeCart() { document.body.classList.remove('cart-open'); drawer.setAttribute('aria-hidden', 'true') }
-document.querySelector('#cartButton').onclick = openCart
-document.querySelector('#closeCart').onclick = closeCart
-document.querySelector('#scrim').onclick = closeCart
-document.querySelector('#checkoutButton').onclick = () => {
-  if (!cart.size) return
-  closeCart(); dialog.showModal()
+function openCart() {
+  document.body.classList.add("cart-open");
+  drawer.setAttribute("aria-hidden", "false");
 }
-document.querySelector('#closeCheckout').onclick = () => dialog.close()
+function closeCart() {
+  document.body.classList.remove("cart-open");
+  drawer.setAttribute("aria-hidden", "true");
+}
+document.querySelector("#cartButton").onclick = openCart;
+document.querySelector("#closeCart").onclick = closeCart;
+document.querySelector("#scrim").onclick = closeCart;
+document.querySelector("#checkoutButton").onclick = () => {
+  if (cart.size) {
+    closeCart();
+    checkoutDialog.showModal();
+  }
+};
+document.querySelector("#closeCheckout").onclick = () => checkoutDialog.close();
 
 function startLiveData() {
-  menu = fallbackMenu
-  renderMenu()
-  renderCart()
+  menu = fallbackMenu;
+  renderMenu();
+  renderCart();
   if (!convexClient) {
-    console.warn('Using local previews because the live data client is unavailable.')
-    return
+    console.warn(
+      "Using local previews because the live data client is unavailable.",
+    );
+    return;
   }
-  subscriptions.push(convexClient.onUpdate('menuItems:listAvailable', {}, nextMenu => {
-    const nextSignature = JSON.stringify(nextMenu.map(item => [item._id, item.updatedAt, item.isAvailable, item.price, item.imageStorageId, item.imageUrl]))
-    if (nextSignature === menuSignature) return
-    menuSignature = nextSignature
-    menu = nextMenu
-    renderMenu(); renderCart()
-  }, error => console.warn('Using the local menu preview.', error)))
+  subscriptions.push(
+    convexClient.onUpdate(
+      "menuItems:listAvailable",
+      {},
+      (nextMenu) => {
+        const nextSignature = JSON.stringify(
+          nextMenu.map((item) => [item._id, item.updatedAt, item.imageUrl]),
+        );
+        if (nextSignature === menuSignature) return;
+        menuSignature = nextSignature;
+        menu = nextMenu;
+        renderMenu();
+        renderCart();
+      },
+      (error) => console.warn("Using the local menu preview.", error),
+    ),
+  );
 }
 
-document.querySelector('#checkoutForm').addEventListener('submit', async event => {
-  event.preventDefault()
-  const message = document.querySelector('#checkoutMessage')
-  const button = event.submitter
-  if (!convexClient) {
-    message.className = 'form-message error'; message.textContent = 'Ordering opens when this site is connected to The Patio’s Convex deployment.'; return
-  }
-  button.disabled = true; button.textContent = 'Opening Clover…'; message.textContent = ''
-  const form = new FormData(event.currentTarget)
-  const lines = cartLines()
-  try {
-    checkoutRequestId ||= crypto.randomUUID()
-    const result = await convexClient.action('clover:createHostedCheckout', {
-      clientRequestId: checkoutRequestId,
-      customerName: form.get('customerName').trim(), phone: form.get('phone').trim(), email: form.get('email').trim(), notes: form.get('notes').trim(), ageConfirmed: form.get('ageConfirmed') === 'on',
-      items: lines.map(({ item, quantity }) => ({ menuItemId: item._id, quantity, selectedAddOns: [] }))
-    })
-    message.className = 'form-message success'; message.textContent = `Opening secure checkout for ${result.orderNumber}…`
-    window.location.assign(result.checkoutUrl)
-  } catch (error) {
-    message.className = 'form-message error'; message.textContent = error?.data?.message || 'We could not open secure checkout. Please try again.'
-  } finally { button.disabled = false; button.textContent = 'Pay securely with Clover' }
-})
+document
+  .querySelector("#checkoutForm")
+  .addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const message = document.querySelector("#checkoutMessage");
+    const button = event.submitter;
+    if (!convexClient) {
+      message.className = "form-message error";
+      message.textContent =
+        "Ordering opens when this site is connected to The Patio’s Convex deployment.";
+      return;
+    }
+    button.disabled = true;
+    button.textContent = "Opening Clover…";
+    message.textContent = "";
+    const form = new FormData(event.currentTarget);
+    try {
+      checkoutRequestId ||= crypto.randomUUID();
+      const result = await convexClient.action("clover:createHostedCheckout", {
+        clientRequestId: checkoutRequestId,
+        customerName: form.get("customerName").trim(),
+        phone: form.get("phone").trim(),
+        email: form.get("email").trim(),
+        notes: form.get("notes").trim(),
+        ageConfirmed: form.get("ageConfirmed") === "on",
+        items: cartLines().map(({ item, quantity, selectedOptions }) => ({
+          menuItemId: item._id,
+          quantity,
+          selectedOptions,
+        })),
+      });
+      message.className = "form-message success";
+      message.textContent = `Opening secure checkout for ${result.orderNumber}…`;
+      window.location.assign(result.checkoutUrl);
+    } catch (error) {
+      message.className = "form-message error";
+      message.textContent =
+        error?.data?.message ||
+        "We could not open secure checkout. Please try again.";
+    } finally {
+      button.disabled = false;
+      button.textContent = "Pay securely with Clover";
+    }
+  });
 
-const paymentResult = new URLSearchParams(window.location.search).get('payment')
+const paymentResult = new URLSearchParams(window.location.search).get(
+  "payment",
+);
 if (paymentResult) {
-  const toast = document.querySelector('#cartToast')
-  toast.textContent = paymentResult === 'success' ? 'Payment submitted. Your order will appear when Clover confirms it.' : 'Payment was not completed. Your order was not sent to the bar.'
-  toast.classList.add('show')
-  window.setTimeout(() => toast.classList.remove('show'), 7000)
+  const toast = document.querySelector("#cartToast");
+  toast.textContent =
+    paymentResult === "success"
+      ? "Payment submitted. Your order will appear when Clover confirms it."
+      : "Payment was not completed. Your order was not sent to the bar.";
+  toast.classList.add("show");
+  window.setTimeout(() => toast.classList.remove("show"), 7000);
 }
-
-window.addEventListener('beforeunload', () => {
-  subscriptions.forEach(unsubscribe => unsubscribe())
-  convexClient?.close()
-})
-startLiveData()
+window.addEventListener("beforeunload", () => {
+  subscriptions.forEach((unsubscribe) => unsubscribe());
+  convexClient?.close();
+});
+startLiveData();
