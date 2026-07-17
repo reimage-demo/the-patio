@@ -3475,6 +3475,67 @@ body[data-page="status"] .main-nav > a:not(.nav-cta) {
 .menu-catalog {
   max-width: 1440px;
 }
+.bottle-service-section {
+  margin-top: 86px;
+  padding-top: 54px;
+  border-top: 2px solid var(--forest);
+}
+.bottle-service-heading {
+  margin-bottom: 28px;
+}
+.bottle-service-heading h2 {
+  margin: 3px 0 8px;
+  font-size: clamp(32px, 4vw, 52px);
+}
+.bottle-service-heading > span {
+  color: var(--muted);
+}
+.bottle-service-card {
+  border-color: rgba(24, 107, 61, 0.28) !important;
+}
+.tip-picker {
+  margin: 18px 0;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+.tip-picker legend {
+  padding: 0 6px;
+  font-weight: 750;
+}
+.tip-picker > p {
+  margin: 0 0 12px;
+  color: var(--muted);
+  font-size: 12px;
+}
+.tip-options {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 7px;
+}
+.tip-options button {
+  min-height: 42px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: #fff;
+  cursor: pointer;
+}
+.tip-options button.active {
+  color: #fff;
+  border-color: var(--forest);
+  background: var(--forest);
+}
+.tip-picker .custom-tip {
+  margin-top: 12px;
+}
+.checkout-total {
+  margin-top: 15px;
+  padding-top: 14px;
+  display: flex;
+  justify-content: space-between;
+  border-top: 1px solid var(--line);
+  font-size: 16px;
+}
 .menu-items-grid {
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 32px 20px;

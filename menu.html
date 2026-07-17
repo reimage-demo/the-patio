@@ -143,7 +143,7 @@
       <div id="cartItems" class="cart-items"></div>
       <div class="cart-footer">
         <div class="cart-total">
-          <span>Total</span><strong id="cartTotal">$0.00</strong>
+          <span>Subtotal</span><strong id="cartTotal">$0.00</strong>
         </div>
         <button class="button button-primary full" id="checkoutButton">
           Continue to checkout
@@ -214,6 +214,18 @@
             rows="3"
             placeholder="Allergies or special requests"
           ></textarea></label
+        ><fieldset class="tip-picker">
+          <legend>Add a tip</legend>
+          <p>Leave an optional tip for The Patio team.</p>
+          <div class="tip-options" id="tipOptions">
+            <button type="button" data-tip-percent="0">No tip</button>
+            <button type="button" data-tip-percent="15">15%</button>
+            <button type="button" data-tip-percent="20" class="active">20%</button>
+            <button type="button" data-tip-percent="25">25%</button>
+          </div>
+          <label class="custom-tip">Custom tip ($)<input name="customTip" id="customTip" type="number" min="0" step=".01" inputmode="decimal" placeholder="0.00" /></label>
+          <div class="checkout-total"><span>Order total</span><strong id="checkoutTotal">$0.00</strong></div>
+        </fieldset
         ><label class="age-check"
           ><input name="ageConfirmed" type="checkbox" required /><span
             >I confirm that I am 21 or older and will bring valid ID.</span

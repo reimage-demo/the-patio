@@ -19,6 +19,7 @@ let menuSignature = "";
 let activeCategory = "All";
 let checkoutRequestId = null;
 let customizingItemId = null;
+let selectedTipPercent = 20;
 let toastTimer;
 const subscriptions = [];
 
@@ -32,8 +33,11 @@ function renderMenu() {
         leftRank - rightRank || (left.sortOrder || 0) - (right.sortOrder || 0)
       );
     });
+  const regularItems = available.filter((item) => !item.isBottleService);
+  const bottleItems = available.filter((item) => item.isBottleService);
   const categories = [
-    ...new Set(available.map((item) => item.category || "Menu")),
+    ...new Set(regularItems.map((item) => item.category || "Menu")),
+    ...(bottleItems.length ? ["Bottle Service"] : []),
   ];
   if (activeCategory !== "All" && !categories.includes(activeCategory))
     activeCategory = "All";
@@ -43,16 +47,10 @@ function renderMenu() {
         `<button type="button" class="${category === activeCategory ? "active" : ""}" data-category="${escapeHtml(category)}" aria-pressed="${category === activeCategory}">${escapeHtml(category)}</button>`,
     )
     .join("");
-  const visible =
-    activeCategory === "All"
-      ? available
-      : available.filter(
-          (item) => (item.category || "Menu") === activeCategory,
-        );
-  menuGrid.innerHTML = visible.length
-    ? `<div class="menu-items-grid">${visible
-        .map((item) => {
-          const badge = item.isDrinkOfNight
+  const card = (item) => {
+          const badge = item.isBottleService
+            ? '<span class="menu-card-badge custom-badge">Bottle Service</span>'
+            : item.isDrinkOfNight
             ? '<span class="menu-card-badge night-badge">Drink of the Night</span>'
             : item.isCustomDrink
               ? '<span class="menu-card-badge custom-badge">Build Your Own</span>'
@@ -63,9 +61,16 @@ function renderMenu() {
             ? `Starting at ${money(item.price)}`
             : `${money(item.price)}${item.optionGroups?.some((group) => group.options.some((option) => option.price)) ? "+" : ""}`;
           const actionLabel = item.optionGroups?.length ? "Customize" : "Add";
-          return `<article class="menu-card${item.isFeatured ? " is-featured" : ""}${item.isDrinkOfNight ? " drink-of-night" : ""}${item.isCustomDrink ? " custom-drink" : ""}"><div class="menu-card-media">${badge}${item.imageUrl ? `<img src="${escapeHtml(item.imageUrl)}" width="800" height="600" loading="lazy" decoding="async" alt="${escapeHtml(item.name)}">` : '<div class="menu-photo-placeholder"><span>Photo coming soon</span></div>'}<button type="button" class="add-button" data-add="${item._id}" aria-label="${actionLabel} ${escapeHtml(item.name)}"><span>${actionLabel}</span><b aria-hidden="true"><svg viewBox="0 0 20 20" focusable="false"><path d="M10 4v12M4 10h12" /></svg></b></button></div><div class="menu-card-body"><div class="menu-card-top"><h3>${escapeHtml(item.name)}</h3><span class="menu-card-price">${priceLabel}</span></div><p>${escapeHtml(item.description)}</p></div></article>`;
-        })
-        .join("")}</div>`
+          return `<article class="menu-card${item.isFeatured ? " is-featured" : ""}${item.isDrinkOfNight ? " drink-of-night" : ""}${item.isCustomDrink ? " custom-drink" : ""}${item.isBottleService ? " bottle-service-card" : ""}"><div class="menu-card-media">${badge}${item.imageUrl ? `<img src="${escapeHtml(item.imageUrl)}" width="800" height="600" loading="lazy" decoding="async" alt="${escapeHtml(item.name)}">` : '<div class="menu-photo-placeholder"><span>Photo coming soon</span></div>'}<button type="button" class="add-button" data-add="${item._id}" aria-label="${actionLabel} ${escapeHtml(item.name)}"><span>${actionLabel}</span><b aria-hidden="true"><svg viewBox="0 0 20 20" focusable="false"><path d="M10 4v12M4 10h12" /></svg></b></button></div><div class="menu-card-body"><div class="menu-card-top"><h3>${escapeHtml(item.name)}</h3><span class="menu-card-price">${priceLabel}</span></div><p>${escapeHtml(item.description)}</p></div></article>`;
+  };
+  const visibleRegular = activeCategory === "All"
+    ? regularItems
+    : regularItems.filter((item) => (item.category || "Menu") === activeCategory);
+  const visibleBottles = activeCategory === "All" || activeCategory === "Bottle Service"
+    ? bottleItems
+    : [];
+  menuGrid.innerHTML = visibleRegular.length || visibleBottles.length
+    ? `${visibleRegular.length ? `<div class="menu-items-grid">${visibleRegular.map(card).join("")}</div>` : ""}${visibleBottles.length ? `<section class="bottle-service-section"><div class="bottle-service-heading"><p class="eyebrow dark">Reserve the table</p><h2>Bottle Service</h2><span>Choose your bottles, included drinks and chasers.</span></div><div class="menu-items-grid">${visibleBottles.map(card).join("")}</div></section>` : ""}`
     : '<div class="empty-state">No drinks are available in this category right now.</div>';
 }
 
@@ -157,9 +162,11 @@ function changeQuantity(key, delta) {
 
 function openCustomizer(item) {
   customizingItemId = item._id;
-  document.querySelector("#customizeEyebrow").textContent = item.isCustomDrink
-    ? "Build Your Own"
-    : "Make it yours";
+  document.querySelector("#customizeEyebrow").textContent = item.isBottleService
+    ? "Bottle Service"
+    : item.isCustomDrink
+      ? "Build Your Own"
+      : "Make it yours";
   document.querySelector("#customizeTitle").textContent = item.name;
   document.querySelector("#customizeDescription").textContent =
     item.description;
@@ -252,6 +259,27 @@ function renderCart() {
         .join("")
     : '<div class="cart-empty">Your cart is ready for something good.</div>';
 }
+
+function cartSubtotal() {
+  return cartLines().reduce(
+    (sum, line) =>
+      sum + lineUnitPrice(line.item, line.selectedOptions) * line.quantity,
+    0,
+  );
+}
+
+function selectedTip() {
+  const custom = document.querySelector("#customTip");
+  if (custom?.value !== "")
+    return Math.max(0, Math.round(Number(custom.value || 0) * 100));
+  return Math.round((cartSubtotal() * selectedTipPercent) / 100);
+}
+
+function renderCheckoutTotal() {
+  document.querySelector("#checkoutTotal").textContent = money(
+    cartSubtotal() + selectedTip(),
+  );
+}
 cartItemsElement.addEventListener("click", (event) => {
   const minus = event.target.closest("[data-minus]");
   const plus = event.target.closest("[data-plus]");
@@ -273,10 +301,29 @@ document.querySelector("#scrim").onclick = closeCart;
 document.querySelector("#checkoutButton").onclick = () => {
   if (cart.size) {
     closeCart();
+    renderCheckoutTotal();
     checkoutDialog.showModal();
   }
 };
 document.querySelector("#closeCheckout").onclick = () => checkoutDialog.close();
+document.querySelector("#tipOptions").addEventListener("click", (event) => {
+  const button = event.target.closest("[data-tip-percent]");
+  if (!button) return;
+  selectedTipPercent = Number(button.dataset.tipPercent);
+  document.querySelector("#customTip").value = "";
+  document.querySelectorAll("[data-tip-percent]").forEach((option) =>
+    option.classList.toggle("active", option === button),
+  );
+  checkoutRequestId = null;
+  renderCheckoutTotal();
+});
+document.querySelector("#customTip").addEventListener("input", () => {
+  document.querySelectorAll("[data-tip-percent]").forEach((option) =>
+    option.classList.remove("active"),
+  );
+  checkoutRequestId = null;
+  renderCheckoutTotal();
+});
 
 function startLiveData() {
   menu = fallbackMenu;
@@ -332,6 +379,7 @@ document
         email: form.get("email").trim(),
         notes: form.get("notes").trim(),
         ageConfirmed: form.get("ageConfirmed") === "on",
+        tip: selectedTip(),
         items: cartLines().map(({ item, quantity, selectedOptions }) => ({
           menuItemId: item._id,
           quantity,
