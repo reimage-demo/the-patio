@@ -60,7 +60,7 @@ function renderMenu() {
           const priceLabel = item.isCustomDrink
             ? `Starting at ${money(item.price)}`
             : `${money(item.price)}${item.optionGroups?.some((group) => group.options.some((option) => option.price)) ? "+" : ""}`;
-          const actionLabel = item.optionGroups?.length ? "Customize" : "Add";
+          const actionLabel = "Add";
           return `<article class="menu-card${item.isFeatured ? " is-featured" : ""}${item.isDrinkOfNight ? " drink-of-night" : ""}${item.isCustomDrink ? " custom-drink" : ""}${item.isBottleService ? " bottle-service-card" : ""}"><div class="menu-card-media">${badge}${item.imageUrl ? `<img src="${escapeHtml(item.imageUrl)}" width="800" height="600" loading="lazy" decoding="async" alt="${escapeHtml(item.name)}">` : '<div class="menu-photo-placeholder"><span>Photo coming soon</span></div>'}<button type="button" class="add-button" data-add="${item._id}" aria-label="${actionLabel} ${escapeHtml(item.name)}"><span>${actionLabel}</span><b aria-hidden="true"><svg viewBox="0 0 20 20" focusable="false"><path d="M10 4v12M4 10h12" /></svg></b></button></div><div class="menu-card-body"><div class="menu-card-top"><h3>${escapeHtml(item.name)}</h3><span class="menu-card-price">${priceLabel}</span></div><p>${escapeHtml(item.description)}</p></div></article>`;
   };
   const visibleRegular = activeCategory === "All"
@@ -401,7 +401,7 @@ document
         "We could not open secure checkout. Please try again.";
     } finally {
       button.disabled = false;
-      button.textContent = "Pay securely with Clover";
+      button.textContent = "Continue to payment";
     }
   });
 

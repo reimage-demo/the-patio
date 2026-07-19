@@ -3515,6 +3515,7 @@ body[data-page="status"] .main-nav > a:not(.nav-cta) {
 }
 .tip-options button {
   min-height: 42px;
+  color: #000;
   border: 1px solid var(--line);
   border-radius: 6px;
   background: #fff;
