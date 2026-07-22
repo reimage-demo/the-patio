@@ -30,7 +30,7 @@
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Sora:wght@500;600;700;800&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="styles.css?v=20260716-1" />
+    <link rel="stylesheet" href="styles.css?v=20260722-1" />
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -214,6 +214,20 @@
             rows="3"
             placeholder="Allergies or special requests"
           ></textarea></label
+        ><fieldset class="coupon-entry">
+          <legend>Discount code</legend>
+          <div>
+            <input
+              id="couponCode"
+              name="couponCode"
+              autocomplete="off"
+              maxlength="32"
+              placeholder="Enter code"
+            />
+            <button type="button" id="applyCoupon">Apply</button>
+          </div>
+          <p id="couponMessage" aria-live="polite"></p>
+        </fieldset
         ><fieldset class="tip-picker">
           <legend>Add a tip</legend>
           <p>Leave an optional tip for The Patio team.</p>
@@ -224,6 +238,7 @@
             <button type="button" data-tip-percent="25">25%</button>
           </div>
           <label class="custom-tip">Custom tip ($)<input name="customTip" id="customTip" type="number" min="0" step=".01" inputmode="decimal" placeholder="0.00" /></label>
+          <div class="checkout-discount" id="checkoutDiscount" hidden><span>Discount</span><strong id="checkoutDiscountAmount">−$0.00</strong></div>
           <div class="checkout-total"><span>Order total</span><strong id="checkoutTotal">$0.00</strong></div>
         </fieldset
         ><label class="age-check"
@@ -293,6 +308,6 @@
     <script src="vendor/convex-client.js?v=20260715-2" defer></script>
     <script src="data.js?v=20260715-5" defer></script>
     <script src="shared.js?v=20260715-7" defer></script>
-    <script src="menu.js?v=20260716-2" defer></script>
+    <script src="menu.js?v=20260722-1" defer></script>
   </body>
 </html>

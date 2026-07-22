@@ -3537,6 +3537,56 @@ body[data-page="status"] .main-nav > a:not(.nav-cta) {
   border-top: 1px solid var(--line);
   font-size: 16px;
 }
+.coupon-entry {
+  margin: 16px 0;
+  padding: 0;
+  border: 0;
+}
+.coupon-entry legend {
+  margin-bottom: 7px;
+  font-size: 11px;
+  font-weight: 700;
+}
+.coupon-entry > div {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+}
+.coupon-entry button {
+  min-width: 84px;
+  padding: 0 16px;
+  border: 1px solid var(--forest);
+  border-radius: 8px;
+  color: #fff;
+  background: var(--forest);
+  font-weight: 700;
+  cursor: pointer;
+}
+.coupon-entry button:disabled {
+  opacity: 0.55;
+}
+.coupon-entry > p {
+  min-height: 18px;
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 11px;
+}
+.coupon-entry > p.success {
+  color: var(--green);
+}
+.coupon-entry > p.error {
+  color: #a32626;
+}
+.checkout-discount {
+  margin-top: 14px;
+  display: flex;
+  justify-content: space-between;
+  color: var(--green);
+  font-size: 13px;
+}
+.checkout-discount[hidden] {
+  display: none;
+}
 .menu-items-grid {
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 32px 20px;

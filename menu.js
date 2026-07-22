@@ -20,6 +20,7 @@ let activeCategory = "All";
 let checkoutRequestId = null;
 let customizingItemId = null;
 let selectedTipPercent = 20;
+let appliedCoupon = null;
 let toastTimer;
 const subscriptions = [];
 
@@ -148,6 +149,7 @@ function addConfiguredItem(item, selectedOptions) {
     quantity: (existing?.quantity || 0) + 1,
   });
   checkoutRequestId = null;
+  clearAppliedCoupon();
   renderCart();
   showAdded(item._id);
 }
@@ -157,6 +159,7 @@ function changeQuantity(key, delta) {
   const next = line.quantity + delta;
   next > 0 ? cart.set(key, { ...line, quantity: next }) : cart.delete(key);
   checkoutRequestId = null;
+  clearAppliedCoupon();
   renderCart();
 }
 
@@ -276,9 +279,25 @@ function selectedTip() {
 }
 
 function renderCheckoutTotal() {
+  const discount = Math.min(appliedCoupon?.discount || 0, cartSubtotal());
   document.querySelector("#checkoutTotal").textContent = money(
-    cartSubtotal() + selectedTip(),
+    cartSubtotal() - discount + selectedTip(),
   );
+  const discountRow = document.querySelector("#checkoutDiscount");
+  discountRow.hidden = !discount;
+  document.querySelector("#checkoutDiscountAmount").textContent = `−${money(discount)}`;
+}
+
+function clearAppliedCoupon(clearInput = false) {
+  appliedCoupon = null;
+  const input = document.querySelector("#couponCode");
+  const message = document.querySelector("#couponMessage");
+  if (clearInput && input) input.value = "";
+  if (message) {
+    message.className = "";
+    message.textContent = "";
+  }
+  renderCheckoutTotal();
 }
 cartItemsElement.addEventListener("click", (event) => {
   const minus = event.target.closest("[data-minus]");
@@ -323,6 +342,50 @@ document.querySelector("#customTip").addEventListener("input", () => {
   );
   checkoutRequestId = null;
   renderCheckoutTotal();
+});
+
+document.querySelector("#couponCode").addEventListener("input", () => {
+  if (appliedCoupon) clearAppliedCoupon();
+  checkoutRequestId = null;
+});
+document.querySelector("#applyCoupon").addEventListener("click", async () => {
+  const input = document.querySelector("#couponCode");
+  const message = document.querySelector("#couponMessage");
+  const button = document.querySelector("#applyCoupon");
+  const code = input.value.trim().toUpperCase();
+  input.value = code;
+  if (!convexClient || !code) {
+    message.className = "error";
+    message.textContent = "Enter a discount code.";
+    return;
+  }
+  button.disabled = true;
+  message.className = "";
+  message.textContent = "Checking code…";
+  try {
+    const result = await convexClient.query("coupons:validate", {
+      code,
+      subtotal: cartSubtotal(),
+    });
+    if (!result.valid) {
+      appliedCoupon = null;
+      message.className = "error";
+      message.textContent = result.message;
+    } else {
+      appliedCoupon = result;
+      checkoutRequestId = null;
+      message.className = "success";
+      message.textContent = `${result.code} applied — ${result.label}.`;
+    }
+    renderCheckoutTotal();
+  } catch {
+    appliedCoupon = null;
+    message.className = "error";
+    message.textContent = "We could not check that code. Please try again.";
+    renderCheckoutTotal();
+  } finally {
+    button.disabled = false;
+  }
 });
 
 function startLiveData() {
@@ -380,6 +443,7 @@ document
         notes: form.get("notes").trim(),
         ageConfirmed: form.get("ageConfirmed") === "on",
         tip: selectedTip(),
+        ...(appliedCoupon?.code ? { couponCode: appliedCoupon.code } : {}),
         items: cartLines().map(({ item, quantity, selectedOptions }) => ({
           menuItemId: item._id,
           quantity,

@@ -86,6 +86,25 @@ https://precious-gecko-619.convex.site/clover/webhook
 
 Generate the webhook signing secret in Clover after entering that URL, then store it as `CLOVER_WEBHOOK_SECRET` in Convex. The signed webhook is the source of truth: only an `APPROVED` Clover payment makes an order visible on the public status board and in the admin portal. Webhook retries are idempotent.
 
+## Pushover order notifications
+
+New paid orders, including complimentary orders, schedule a Pushover notification from Convex. Store the credentials only in the target Convex deployment:
+
+```text
+PUSHOVER_API_TOKEN
+PUSHOVER_USER_KEY
+```
+
+Send a test notification from a trusted terminal with:
+
+```bash
+npx convex run notifications:sendTest
+```
+
+## Coupons
+
+Admins can create percentage or fixed-dollar discount codes from the **Coupons** tab. Active codes are validated in Convex, and the checkout action recalculates the discount from server-side menu prices before creating the Clover checkout session. Applied codes and discount amounts are stored with the order.
+
 ## Production checklist
 
 - Replace the placeholder phone, email and partial Main Street address.
