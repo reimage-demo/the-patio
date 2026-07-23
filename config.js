@@ -1,3 +1,3 @@
 window.PATIO_CONFIG = {
-  convexUrl: 'https://precious-gecko-619.convex.cloud'
+  convexUrl: 'https://judicious-chihuahua-601.convex.cloud'
 }

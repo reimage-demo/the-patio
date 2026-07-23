@@ -81,7 +81,7 @@ PUBLIC_SITE_URL=https://your-public-site.example
 For sandbox testing, set `CLOVER_API_BASE_URL=https://apisandbox.dev.clover.com` and use sandbox credentials. Configure Clover Hosted Checkout to send payment webhooks to:
 
 ```text
-https://precious-gecko-619.convex.site/clover/webhook
+https://judicious-chihuahua-601.convex.site/clover/webhook
 ```
 
 Generate the webhook signing secret in Clover after entering that URL, then store it as `CLOVER_WEBHOOK_SECRET` in Convex. The signed webhook is the source of truth: only an `APPROVED` Clover payment makes an order visible on the public status board and in the admin portal. Webhook retries are idempotent.
