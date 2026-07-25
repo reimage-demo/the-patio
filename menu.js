@@ -24,6 +24,10 @@ let appliedCoupon = null;
 let toastTimer;
 const subscriptions = [];
 
+function showsStartingPrice(item) {
+  return item.isCustomDrink === true || item.isBottleService === true;
+}
+
 function renderMenu() {
   const available = menu
     .filter((item) => item.isAvailable)
@@ -58,7 +62,7 @@ function renderMenu() {
               : item.isFeatured
                 ? '<span class="menu-card-badge">Featured</span>'
                 : "";
-          const priceLabel = item.isCustomDrink
+          const priceLabel = showsStartingPrice(item)
             ? `Starting at ${money(item.price)}`
             : `${money(item.price)}${item.optionGroups?.some((group) => group.options.some((option) => option.price)) ? "+" : ""}`;
           const actionLabel = "Add";
@@ -403,9 +407,7 @@ function startLiveData() {
       "menuItems:listAvailable",
       {},
       (nextMenu) => {
-        const nextSignature = JSON.stringify(
-          nextMenu.map((item) => [item._id, item.updatedAt, item.imageUrl]),
-        );
+        const nextSignature = JSON.stringify(nextMenu);
         if (nextSignature === menuSignature) return;
         menuSignature = nextSignature;
         menu = nextMenu;
