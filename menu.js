@@ -25,6 +25,8 @@ let toastTimer;
 const subscriptions = [];
 
 function showsStartingPrice(item) {
+  if (typeof item.showsStartingPrice === "boolean")
+    return item.showsStartingPrice;
   return item.isCustomDrink === true || item.isBottleService === true;
 }
 
@@ -53,30 +55,35 @@ function renderMenu() {
     )
     .join("");
   const card = (item) => {
-          const badge = item.isBottleService
-            ? '<span class="menu-card-badge custom-badge">Bottle Service</span>'
-            : item.isDrinkOfNight
-            ? '<span class="menu-card-badge night-badge">Drink of the Night</span>'
-            : item.isCustomDrink
-              ? '<span class="menu-card-badge custom-badge">Build Your Own</span>'
-              : item.isFeatured
-                ? '<span class="menu-card-badge">Featured</span>'
-                : "";
-          const priceLabel = showsStartingPrice(item)
-            ? `Starting at ${money(item.price)}`
-            : `${money(item.price)}${item.optionGroups?.some((group) => group.options.some((option) => option.price)) ? "+" : ""}`;
-          const actionLabel = "Add";
-          return `<article class="menu-card${item.isFeatured ? " is-featured" : ""}${item.isDrinkOfNight ? " drink-of-night" : ""}${item.isCustomDrink ? " custom-drink" : ""}${item.isBottleService ? " bottle-service-card" : ""}"><div class="menu-card-media">${badge}${item.imageUrl ? `<img src="${escapeHtml(item.imageUrl)}" width="800" height="600" loading="lazy" decoding="async" alt="${escapeHtml(item.name)}">` : '<div class="menu-photo-placeholder"><span>Photo coming soon</span></div>'}<button type="button" class="add-button" data-add="${item._id}" aria-label="${actionLabel} ${escapeHtml(item.name)}"><span>${actionLabel}</span><b aria-hidden="true"><svg viewBox="0 0 20 20" focusable="false"><path d="M10 4v12M4 10h12" /></svg></b></button></div><div class="menu-card-body"><div class="menu-card-top"><h3>${escapeHtml(item.name)}</h3><span class="menu-card-price">${priceLabel}</span></div><p>${escapeHtml(item.description)}</p></div></article>`;
+    const badge = item.isBottleService
+      ? '<span class="menu-card-badge custom-badge">Bottle Service</span>'
+      : item.isDrinkOfNight
+        ? '<span class="menu-card-badge night-badge">Drink of the Night</span>'
+        : item.isCustomDrink
+          ? '<span class="menu-card-badge custom-badge">Build Your Own</span>'
+          : item.isFeatured
+            ? '<span class="menu-card-badge">Featured</span>'
+            : "";
+    const priceLabel = showsStartingPrice(item)
+      ? `Starting at ${money(item.price)}`
+      : money(item.price);
+    const actionLabel = "Add";
+    return `<article class="menu-card${item.isFeatured ? " is-featured" : ""}${item.isDrinkOfNight ? " drink-of-night" : ""}${item.isCustomDrink ? " custom-drink" : ""}${item.isBottleService ? " bottle-service-card" : ""}"><div class="menu-card-media">${badge}${item.imageUrl ? `<img src="${escapeHtml(item.imageUrl)}" width="800" height="600" loading="lazy" decoding="async" alt="${escapeHtml(item.name)}">` : '<div class="menu-photo-placeholder"><span>Photo coming soon</span></div>'}<button type="button" class="add-button" data-add="${item._id}" aria-label="${actionLabel} ${escapeHtml(item.name)}"><span>${actionLabel}</span><b aria-hidden="true"><svg viewBox="0 0 20 20" focusable="false"><path d="M10 4v12M4 10h12" /></svg></b></button></div><div class="menu-card-body"><div class="menu-card-top"><h3>${escapeHtml(item.name)}</h3><span class="menu-card-price">${priceLabel}</span></div><p>${escapeHtml(item.description)}</p></div></article>`;
   };
-  const visibleRegular = activeCategory === "All"
-    ? regularItems
-    : regularItems.filter((item) => (item.category || "Menu") === activeCategory);
-  const visibleBottles = activeCategory === "All" || activeCategory === "Bottle Service"
-    ? bottleItems
-    : [];
-  menuGrid.innerHTML = visibleRegular.length || visibleBottles.length
-    ? `${visibleRegular.length ? `<div class="menu-items-grid">${visibleRegular.map(card).join("")}</div>` : ""}${visibleBottles.length ? `<section class="bottle-service-section"><div class="bottle-service-heading"><p class="eyebrow dark">Reserve the table</p><h2>Bottle Service</h2><span>Choose your bottles, included drinks and chasers.</span></div><div class="menu-items-grid">${visibleBottles.map(card).join("")}</div></section>` : ""}`
-    : '<div class="empty-state">No drinks are available in this category right now.</div>';
+  const visibleRegular =
+    activeCategory === "All"
+      ? regularItems
+      : regularItems.filter(
+          (item) => (item.category || "Menu") === activeCategory,
+        );
+  const visibleBottles =
+    activeCategory === "All" || activeCategory === "Bottle Service"
+      ? bottleItems
+      : [];
+  menuGrid.innerHTML =
+    visibleRegular.length || visibleBottles.length
+      ? `${visibleRegular.length ? `<div class="menu-items-grid">${visibleRegular.map(card).join("")}</div>` : ""}${visibleBottles.length ? `<section class="bottle-service-section"><div class="bottle-service-heading"><p class="eyebrow dark">Reserve the table</p><h2>Bottle Service</h2><span>Choose your bottles, included drinks and chasers.</span></div><div class="menu-items-grid">${visibleBottles.map(card).join("")}</div></section>` : ""}`
+      : '<div class="empty-state">No drinks are available in this category right now.</div>';
 }
 
 categoryNav.addEventListener("click", (event) => {
@@ -289,7 +296,8 @@ function renderCheckoutTotal() {
   );
   const discountRow = document.querySelector("#checkoutDiscount");
   discountRow.hidden = !discount;
-  document.querySelector("#checkoutDiscountAmount").textContent = `−${money(discount)}`;
+  document.querySelector("#checkoutDiscountAmount").textContent =
+    `−${money(discount)}`;
 }
 
 function clearAppliedCoupon(clearInput = false) {
@@ -334,16 +342,16 @@ document.querySelector("#tipOptions").addEventListener("click", (event) => {
   if (!button) return;
   selectedTipPercent = Number(button.dataset.tipPercent);
   document.querySelector("#customTip").value = "";
-  document.querySelectorAll("[data-tip-percent]").forEach((option) =>
-    option.classList.toggle("active", option === button),
-  );
+  document
+    .querySelectorAll("[data-tip-percent]")
+    .forEach((option) => option.classList.toggle("active", option === button));
   checkoutRequestId = null;
   renderCheckoutTotal();
 });
 document.querySelector("#customTip").addEventListener("input", () => {
-  document.querySelectorAll("[data-tip-percent]").forEach((option) =>
-    option.classList.remove("active"),
-  );
+  document
+    .querySelectorAll("[data-tip-percent]")
+    .forEach((option) => option.classList.remove("active"));
   checkoutRequestId = null;
   renderCheckoutTotal();
 });
