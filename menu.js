@@ -37,7 +37,10 @@ function renderMenu() {
       const leftRank = left.isDrinkOfNight ? 0 : left.isFeatured ? 1 : 2;
       const rightRank = right.isDrinkOfNight ? 0 : right.isFeatured ? 1 : 2;
       return (
-        leftRank - rightRank || (left.sortOrder || 0) - (right.sortOrder || 0)
+        (left.categorySortOrder ?? Number.MAX_SAFE_INTEGER) -
+          (right.categorySortOrder ?? Number.MAX_SAFE_INTEGER) ||
+        leftRank - rightRank ||
+        (left.sortOrder || 0) - (right.sortOrder || 0)
       );
     });
   const regularItems = available.filter((item) => !item.isBottleService);
@@ -80,9 +83,37 @@ function renderMenu() {
     activeCategory === "All" || activeCategory === "Bottle Service"
       ? bottleItems
       : [];
+  const categorySection = (category, items) =>
+    `<section class="menu-category" data-menu-category="${escapeHtml(category)}"><div class="menu-category-heading"><div><p>Explore the menu</p><h2>${escapeHtml(category)}</h2></div><span>${items.length} item${items.length === 1 ? "" : "s"}</span></div><div class="menu-items-grid">${items.map(card).join("")}</div></section>`;
+  const regularMarkup = visibleRegular.length
+    ? activeCategory === "All"
+      ? categories
+          .filter((category) => category !== "Bottle Service")
+          .map((category) => {
+            const items = visibleRegular.filter(
+              (item) => (item.category || "Menu") === category,
+            );
+            return items.length ? categorySection(category, items) : "";
+          })
+          .join("")
+      : categorySection(activeCategory, visibleRegular)
+    : "";
+  const bottleCategories = [
+    ...new Set(visibleBottles.map((item) => item.category || "Bottle Service")),
+  ];
+  const bottleMarkup = visibleBottles.length
+    ? `<section class="bottle-service-section"><div class="bottle-service-heading"><p class="eyebrow dark">Reserve the table</p><h2>Bottle Service</h2><span>Choose a bottle or customize a bottle-service package.</span></div>${bottleCategories
+        .map((category) => {
+          const items = visibleBottles.filter(
+            (item) => (item.category || "Bottle Service") === category,
+          );
+          return `<div class="bottle-subcategory"><h3>${escapeHtml(category)}</h3><div class="menu-items-grid">${items.map(card).join("")}</div></div>`;
+        })
+        .join("")}</section>`
+    : "";
   menuGrid.innerHTML =
     visibleRegular.length || visibleBottles.length
-      ? `${visibleRegular.length ? `<div class="menu-items-grid">${visibleRegular.map(card).join("")}</div>` : ""}${visibleBottles.length ? `<section class="bottle-service-section"><div class="bottle-service-heading"><p class="eyebrow dark">Reserve the table</p><h2>Bottle Service</h2><span>Choose your bottles, included drinks and chasers.</span></div><div class="menu-items-grid">${visibleBottles.map(card).join("")}</div></section>` : ""}`
+      ? `${regularMarkup}${bottleMarkup}`
       : '<div class="empty-state">No drinks are available in this category right now.</div>';
 }
 
