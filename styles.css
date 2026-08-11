@@ -3490,6 +3490,15 @@ body[data-page="status"] .main-nav > a:not(.nav-cta) {
 .bottle-service-heading > span {
   color: var(--muted);
 }
+.bottle-subcategory + .bottle-subcategory {
+  margin-top: 42px;
+}
+.bottle-subcategory > h3 {
+  margin: 0 0 18px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--line);
+  font-size: 22px;
+}
 .bottle-service-card {
   border-color: rgba(24, 107, 61, 0.28) !important;
 }
