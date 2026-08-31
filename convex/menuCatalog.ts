@@ -304,11 +304,7 @@ export const addMissingClientMenu = internalMutation({
 });
 
 type SectionType =
-  | "spirit"
-  | "beverage"
-  | "specialty"
-  | "bottle-service"
-  | "service";
+  "spirit" | "beverage" | "specialty" | "bottle-service" | "service";
 type ItemType =
   | "cocktail"
   | "pour"
@@ -414,11 +410,8 @@ const spiritFirstSections: Array<{
   },
 ];
 
-const assigned = (
-  section: string,
-  itemType: ItemType,
-  names: string[],
-) => names.map((name) => ({ name, section, itemType }));
+const assigned = (section: string, itemType: ItemType, names: string[]) =>
+  names.map((name) => ({ name, section, itemType }));
 
 const spiritFirstAssignments = [
   ...assigned("Build Your Own", "custom", ["Build Your Own Drink"]),
@@ -499,9 +492,7 @@ const spiritFirstAssignments = [
     "Non-Alcoholic Cocktail",
     "Red Bull",
   ]),
-  ...assigned("Bottle Service", "package", [
-    "The Patio VIP Bottle Experience",
-  ]),
+  ...assigned("Bottle Service", "package", ["The Patio VIP Bottle Experience"]),
   ...assigned("Bottle Service", "bottle", [
     "Hennessy Bottle",
     "Hennessy 375 ml Bottle",
@@ -538,6 +529,379 @@ function assignmentMap() {
   }
   return result;
 }
+
+const generatedImageBasePath = "/assets/images/menu-generated";
+const generatedImageAssignments = [
+  {
+    id: "jd7b61m38yyznabzp15krcgf4n8anpk2",
+    name: "Build Your Own Drink",
+    file: "build-your-own-drink.webp",
+  },
+  {
+    id: "jd70t7ee5fvmj124yzhc9cf09h8c86kr",
+    name: "Hennessy Bottle",
+    file: "hennessy-bottle.webp",
+  },
+  {
+    id: "jd7bgmr013mz1w0vqmnxm7h7718c8at7",
+    name: "Hennessy 375 ml Bottle",
+    file: "hennessy-375-ml-bottle.webp",
+  },
+  {
+    id: "jd78tmxv28gdzzv87essfhcje18c8n14",
+    name: "Rémy Martin 1738 375 ml Bottle",
+    file: "remy-martin-1738-375-ml-bottle.webp",
+  },
+  {
+    id: "jd76gnjex3tbgj6b2s6wgsqc298c8ds8",
+    name: "Don Julio 375 ml Bottle",
+    file: "don-julio-375-ml-bottle.webp",
+  },
+  {
+    id: "jd7erd2d63sr2n8fp0jdkxtthn8c9xcp",
+    name: "Tito’s 200 ml Bottle",
+    file: "titos-200-ml-bottle.webp",
+  },
+  {
+    id: "jd7fqmqbfap09wky6k5b0ecjj98c8mkh",
+    name: "Tropical Storm",
+    file: "tropical-storm.webp",
+  },
+  {
+    id: "jd7fxr3en8x8qaxk76q8x882q18c9qkb",
+    name: "The Patio",
+    file: "the-patio.webp",
+  },
+  {
+    id: "jd7dta3q7mtwzwrrrd8fdckf3s8c81fy",
+    name: "Lemon Drop",
+    file: "lemon-drop.webp",
+  },
+  {
+    id: "jd795abf5ahgdpmtpaey8024rx8c894f",
+    name: "Hugo Spritz",
+    file: "hugo-spritz.webp",
+  },
+  {
+    id: "jd77ddtj3f2jxa433rpg3abwbx8c8ze8",
+    name: "Rum Punch",
+    file: "rum-punch.webp",
+  },
+  {
+    id: "jd76wa8n4bj9tpppswbvmdn3t98c9frd",
+    name: "Mojito",
+    file: "mojito.webp",
+  },
+  {
+    id: "jd7bypvdm5402pnbc2xnr24zah8c9q97",
+    name: "Long Island",
+    file: "long-island.webp",
+  },
+  {
+    id: "jd7bew9y064s1rfbf04k4rahgs8c8b7q",
+    name: "Non-Alcoholic Cocktail",
+    file: "non-alcoholic-cocktail.webp",
+  },
+  { id: "jd71re4k48q1ncwwvkcqwwfsg58c9cyk", name: "Cîroc", file: "ciroc.webp" },
+  {
+    id: "jd7ang8a7bz5rg9a1932rknscx8c8mrp",
+    name: "Cîroc Pineapple",
+    file: "ciroc-pineapple.webp",
+  },
+  {
+    id: "jd7aw2391mbn84v1vajdcpqd298c9bbt",
+    name: "Smirnoff",
+    file: "smirnoff.webp",
+  },
+  {
+    id: "jd7fmdgrpx0sdxehpxcgya36h58c9hsj",
+    name: "Absolut",
+    file: "absolut.webp",
+  },
+  {
+    id: "jd79s0sf9zct750wc8004ef5zn8c8fcz",
+    name: "Grey Goose",
+    file: "grey-goose.webp",
+  },
+  {
+    id: "jd7cq72pe6hgcmqyndpxafsx5x8c9d22",
+    name: "Tito’s",
+    file: "titos.webp",
+  },
+  {
+    id: "jd7d1v8xf99f37baqea2px0s458c9ewk",
+    name: "Patrón Silver",
+    file: "patron-silver.webp",
+  },
+  {
+    id: "jd71p37xra933rnd2b0chn1yed8c8k6d",
+    name: "Patrón Reposado",
+    file: "patron-reposado.webp",
+  },
+  {
+    id: "jd74hyxfaec9eb0zh5w0vzr8218c9pbv",
+    name: "Don Julio Blanco",
+    file: "don-julio-blanco.webp",
+  },
+  {
+    id: "jd7c7pfpcwy7fm0hdfqtr37vg98c84dv",
+    name: "Don Julio Reposado",
+    file: "don-julio-reposado.webp",
+  },
+  {
+    id: "jd77dtpfhfx81ybz2ytnh625jh8c8djb",
+    name: "Casamigos",
+    file: "casamigos.webp",
+  },
+  {
+    id: "jd74xegvnag285fn9crep9exwh8c9q28",
+    name: "Casamigos Reposado",
+    file: "casamigos-reposado.webp",
+  },
+  {
+    id: "jd70e678twdrajfb6e9b8s4d5x8c8g7p",
+    name: "José Cuervo",
+    file: "jose-cuervo.webp",
+  },
+  {
+    id: "jd7c9hszh0d1b0jzdydtgs5mws8c81yg",
+    name: "Espolòn Reposado",
+    file: "espolon-reposado.webp",
+  },
+  {
+    id: "jd74ab0ecgkbq5y9qcvaav0k0d8c8c8d",
+    name: "Espolòn Blanco",
+    file: "espolon-blanco.webp",
+  },
+  {
+    id: "jd77f46mzrk8q5h7m1sdbrt1cs8c9b83",
+    name: "1800 Blanco",
+    file: "1800-blanco.webp",
+  },
+  {
+    id: "jd7arscsxz33raxatnvqt1xje18c8nxa",
+    name: "1800 Reposado",
+    file: "1800-reposado.webp",
+  },
+  {
+    id: "jd71bnjzw6fh482ps8v6rzc1zh8c9bcw",
+    name: "Wray & Nephew",
+    file: "wray-and-nephew.webp",
+  },
+  {
+    id: "jd79k8fdyn7mc3xejw79tftntx8c844m",
+    name: "Wray & Nephew Flask",
+    file: "wray-and-nephew-flask.webp",
+  },
+  {
+    id: "jd71epj1rvc9q6jd6f2z01y3vh8c8n8t",
+    name: "Appleton 12 Year",
+    file: "appleton-12-year.webp",
+  },
+  {
+    id: "jd7fv2cvv30jfvv85n8sh2y4pn8c8hzx",
+    name: "Appleton Signature Blend",
+    file: "appleton-signature-blend.webp",
+  },
+  {
+    id: "jd7am1dd4h6j51k5da61mntczs8c904n",
+    name: "Bacardi",
+    file: "bacardi.webp",
+  },
+  {
+    id: "jd70g2g9308j25n1f7txf7dax98c91vc",
+    name: "Captain Morgan",
+    file: "captain-morgan.webp",
+  },
+  {
+    id: "jd72vr9qzzs9xjckw1tk011zh58c8xg1",
+    name: "Kraken Spiced Rum",
+    file: "kraken-spiced-rum.webp",
+  },
+  {
+    id: "jd7ce5xrf4wsfram2aw55neg1n8c9nz1",
+    name: "Malibu",
+    file: "malibu.webp",
+  },
+  {
+    id: "jd7b3ke5ve6am1ex47efyk8hps8c8ex2",
+    name: "Diplomático",
+    file: "diplomatico.webp",
+  },
+  {
+    id: "jd7fav09c5nzpcrv9jqm4hn2yd8c9319",
+    name: "Hangars",
+    file: "hangars.webp",
+  },
+  {
+    id: "jd70hh295pqp4twv4c7qg8sp7h8c93e2",
+    name: "Bombay",
+    file: "bombay.webp",
+  },
+  {
+    id: "jd74yt39kqn6wbf71rq78ryjfx8c90jr",
+    name: "Hennessy",
+    file: "hennessy.webp",
+  },
+  {
+    id: "jd74zfx8rfbkxsz7qg433nvzbn8c9yc7",
+    name: "Hennessy VSOP",
+    file: "hennessy-vsop.webp",
+  },
+  {
+    id: "jd7235vwe9dyvc73d7phdjpvc98c9tbw",
+    name: "Rémy Martin VSOP",
+    file: "remy-martin-vsop.webp",
+  },
+  {
+    id: "jd77nzp5r4be7hw9d389ets8fh8c86g2",
+    name: "Rémy Martin 1738",
+    file: "remy-martin-1738.webp",
+  },
+  {
+    id: "jd7e0dkf16c8h8gkm755h8x6z58c8qf0",
+    name: "D’Ussé",
+    file: "dusse.webp",
+  },
+  {
+    id: "jd70kke04ayb4ra1nd7fvjy3wh8c89an",
+    name: "White Hennessy",
+    file: "white-hennessy.webp",
+  },
+  {
+    id: "jd7617twcj7y43h009x2gydy0n8c8cs5",
+    name: "Woodford Reserve",
+    file: "woodford-reserve.webp",
+  },
+  {
+    id: "jd76vnma08yhhkj374bghtnb4d8c8ekk",
+    name: "Johnnie Walker Black",
+    file: "johnnie-walker-black.webp",
+  },
+  {
+    id: "jd73ermb4s896czfbv9q9y7jw98c9de7",
+    name: "Campari",
+    file: "campari.webp",
+  },
+  {
+    id: "jd70snknf0x72567r6v4327kex8c9x3b",
+    name: "Stone Double",
+    file: "stone-double.webp",
+  },
+  {
+    id: "jd764qz8sk42x18pqhqn79m4ex8c86m5",
+    name: "Red Bull",
+    file: "red-bull.webp",
+  },
+  {
+    id: "jd7arf51b14hx2w549811d43jn8c96sj",
+    name: "Baileys",
+    file: "baileys.webp",
+  },
+  {
+    id: "jd7exkkra74agjvensqx8agv2n8c9vps",
+    name: "Magnum",
+    file: "magnum.webp",
+  },
+  {
+    id: "jd798t0sg52phe3d26zxfd972h8c9x0g",
+    name: "Aperol",
+    file: "aperol.webp",
+  },
+  {
+    id: "jd78q0hgx73rnsgwvjcmbb7x798c82wg",
+    name: "Hookah — 1 Hour",
+    file: "hookah-1-hour.webp",
+  },
+  {
+    id: "jd71s276nrx5zbbehqx8ttb6r58c91fb",
+    name: "Hookah Refill",
+    file: "hookah-refill.webp",
+  },
+  {
+    id: "jd75z3gwyp6zzz5zewnkzgevtd8c92jc",
+    name: "Hookah Special",
+    file: "hookah-special.webp",
+  },
+  {
+    id: "jd7e56fhv3te6h7evm1bjcaaqd8c847p",
+    name: "Hookah Special Refill",
+    file: "hookah-special-refill.webp",
+  },
+] as const;
+
+const generatedImageUrl = (file: string) => `${generatedImageBasePath}/${file}`;
+
+export const assignGeneratedImages = internalMutation({
+  args: {},
+  handler: async (ctx) => {
+    if (
+      new Set(generatedImageAssignments.map((entry) => entry.id)).size !==
+      generatedImageAssignments.length
+    )
+      throw new Error("A generated-image item ID was included more than once.");
+    const checked = [];
+    for (const assignment of generatedImageAssignments) {
+      const item = await ctx.db.get(assignment.id as any);
+      const expectedUrl = generatedImageUrl(assignment.file);
+      if (!item)
+        throw new Error(`Menu item ${assignment.id} no longer exists.`);
+      if (item.name !== assignment.name)
+        throw new Error(
+          `Menu item ${assignment.id} is ${item.name}, not ${assignment.name}.`,
+        );
+      if (!item.isAvailable)
+        throw new Error(`${assignment.name} is no longer publicly available.`);
+      if (item.imageStorageId)
+        throw new Error(
+          `${assignment.name} already has a stored image; nothing was overwritten.`,
+        );
+      if (item.imageUrl && item.imageUrl !== expectedUrl)
+        throw new Error(
+          `${assignment.name} already has a different image; nothing was overwritten.`,
+        );
+      checked.push({ item, expectedUrl });
+    }
+
+    const now = Date.now();
+    let updated = 0;
+    for (const { item, expectedUrl } of checked) {
+      if (item.imageUrl === expectedUrl) continue;
+      await ctx.db.patch(item._id, { imageUrl: expectedUrl, updatedAt: now });
+      updated++;
+    }
+    return { assigned: generatedImageAssignments.length, updated };
+  },
+});
+
+export const verifyGeneratedImages = internalQuery({
+  args: {},
+  handler: async (ctx) => {
+    const items = await ctx.db.query("menuItems").collect();
+    const byId = new Map(items.map((item) => [String(item._id), item]));
+    const errors: string[] = [];
+    for (const assignment of generatedImageAssignments) {
+      const item = byId.get(assignment.id);
+      if (!item) errors.push(`${assignment.name}: item ID is missing`);
+      else if (item.name !== assignment.name)
+        errors.push(`${assignment.name}: item ID belongs to ${item.name}`);
+      else if (item.imageUrl !== generatedImageUrl(assignment.file))
+        errors.push(`${assignment.name}: generated image is not assigned`);
+    }
+    const visibleItems = items.filter((item) => item.isAvailable);
+    return {
+      ok:
+        errors.length === 0 &&
+        visibleItems.every((item) => item.imageStorageId || item.imageUrl),
+      errors,
+      generatedImagesAssigned: generatedImageAssignments.length - errors.length,
+      visibleItems: visibleItems.length,
+      visibleItemsWithImages: visibleItems.filter(
+        (item) => item.imageStorageId || item.imageUrl,
+      ).length,
+    };
+  },
+});
 
 export const organizeSpiritFirst = internalMutation({
   args: {},
@@ -674,14 +1038,18 @@ export const verifySpiritFirst = internalQuery({
       else if (!section)
         errors.push(`${item.name}: missing public section reference`);
       else if (section.name !== assignment.section)
-        errors.push(`${item.name}: expected ${assignment.section}, got ${section.name}`);
+        errors.push(
+          `${item.name}: expected ${assignment.section}, got ${section.name}`,
+        );
       else if (item.itemType !== assignment.itemType)
         errors.push(`${item.name}: expected type ${assignment.itemType}`);
     }
     const sectionNames = categories
       .sort((left, right) => left.sortOrder - right.sortOrder)
       .map((section) => section.name);
-    const expectedSectionNames = spiritFirstSections.map((section) => section.name);
+    const expectedSectionNames = spiritFirstSections.map(
+      (section) => section.name,
+    );
     if (JSON.stringify(sectionNames) !== JSON.stringify(expectedSectionNames))
       errors.push("Public section names or order do not match the plan.");
     const hiddenTest = items.find(
