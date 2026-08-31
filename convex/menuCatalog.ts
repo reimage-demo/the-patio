@@ -530,7 +530,9 @@ function assignmentMap() {
   return result;
 }
 
-const generatedImageBasePath = "/assets/images/menu-generated";
+const generatedImageBasePath =
+  "https://thepatioct.com/assets/images/menu-generated";
+const generatedImageLegacyBasePath = "/assets/images/menu-generated";
 const generatedImageAssignments = [
   {
     id: "jd7b61m38yyznabzp15krcgf4n8anpk2",
@@ -856,7 +858,12 @@ export const assignGeneratedImages = internalMutation({
         throw new Error(
           `${assignment.name} already has a stored image; nothing was overwritten.`,
         );
-      if (item.imageUrl && item.imageUrl !== expectedUrl)
+      const legacyUrl = `${generatedImageLegacyBasePath}/${assignment.file}`;
+      if (
+        item.imageUrl &&
+        item.imageUrl !== expectedUrl &&
+        item.imageUrl !== legacyUrl
+      )
         throw new Error(
           `${assignment.name} already has a different image; nothing was overwritten.`,
         );
