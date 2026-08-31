@@ -833,6 +833,14 @@ const generatedImageAssignments = [
 ] as const;
 
 const generatedImageUrl = (file: string) => `${generatedImageBasePath}/${file}`;
+const preservedImageAssignments = [
+  {
+    id: "jd79hks6edjfrjy9qgmthfgyen8apbjt",
+    name: "The Patio VIP Bottle Experience",
+    legacyUrl: "/assets/images/patio-lounge-2.jpg",
+    expectedUrl: "https://thepatioct.com/assets/images/patio-lounge-2.jpg",
+  },
+] as const;
 
 export const assignGeneratedImages = internalMutation({
   args: {},
@@ -869,6 +877,27 @@ export const assignGeneratedImages = internalMutation({
         );
       checked.push({ item, expectedUrl });
     }
+    for (const assignment of preservedImageAssignments) {
+      const item = await ctx.db.get(assignment.id as any);
+      if (!item)
+        throw new Error(`Menu item ${assignment.id} no longer exists.`);
+      if (item.name !== assignment.name)
+        throw new Error(
+          `Menu item ${assignment.id} is ${item.name}, not ${assignment.name}.`,
+        );
+      if (item.imageStorageId)
+        throw new Error(
+          `${assignment.name} already has a stored image; nothing was overwritten.`,
+        );
+      if (
+        item.imageUrl !== assignment.legacyUrl &&
+        item.imageUrl !== assignment.expectedUrl
+      )
+        throw new Error(
+          `${assignment.name} has an unexpected image; nothing was overwritten.`,
+        );
+      checked.push({ item, expectedUrl: assignment.expectedUrl });
+    }
 
     const now = Date.now();
     let updated = 0;
@@ -877,7 +906,11 @@ export const assignGeneratedImages = internalMutation({
       await ctx.db.patch(item._id, { imageUrl: expectedUrl, updatedAt: now });
       updated++;
     }
-    return { assigned: generatedImageAssignments.length, updated };
+    return {
+      generatedAssigned: generatedImageAssignments.length,
+      preservedAssigned: preservedImageAssignments.length,
+      updated,
+    };
   },
 });
 
@@ -896,12 +929,24 @@ export const verifyGeneratedImages = internalQuery({
         errors.push(`${assignment.name}: generated image is not assigned`);
     }
     const visibleItems = items.filter((item) => item.isAvailable);
+    const nonAdminCompatible = visibleItems.filter(
+      (item) =>
+        !item.imageStorageId &&
+        (!item.imageUrl || !item.imageUrl.startsWith("https://")),
+    );
+    for (const item of nonAdminCompatible)
+      errors.push(`${item.name}: image URL is not admin-compatible`);
     return {
       ok:
         errors.length === 0 &&
         visibleItems.every((item) => item.imageStorageId || item.imageUrl),
       errors,
-      generatedImagesAssigned: generatedImageAssignments.length - errors.length,
+      generatedImagesAssigned: generatedImageAssignments.filter(
+        (assignment) =>
+          byId.get(assignment.id)?.imageUrl ===
+          generatedImageUrl(assignment.file),
+      ).length,
+      adminCompatibleImages: visibleItems.length - nonAdminCompatible.length,
       visibleItems: visibleItems.length,
       visibleItemsWithImages: visibleItems.filter(
         (item) => item.imageStorageId || item.imageUrl,
