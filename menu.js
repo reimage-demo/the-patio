@@ -15,8 +15,9 @@ const convexClient =
     ? new window.PatioConvex.ConvexClient(window.PATIO_CONFIG.convexUrl)
     : null;
 let menu = [];
+let catalogSections = [];
 let menuSignature = "";
-let activeCategory = "All";
+let activeCategory = "all";
 let checkoutRequestId = null;
 let customizingItemId = null;
 let selectedTipPercent = 20;
@@ -30,28 +31,61 @@ function showsStartingPrice(item) {
   return item.isCustomDrink === true || item.isBottleService === true;
 }
 
+const itemTypeLabels = {
+  cocktail: "Cocktail",
+  pour: "Pour",
+  shot: "Shot",
+  flask: "Flask",
+  bottle: "Bottle",
+  package: "Package",
+  wine: "Wine",
+  beer: "Beer",
+  "non-alcoholic": "Non-Alcoholic",
+  hookah: "Hookah",
+  custom: "Custom",
+};
+
+function fallbackSectionsFor(items) {
+  const sections = [];
+  for (const item of items) {
+    const name = item.isBottleService
+      ? "Bottle Service"
+      : item.category || "Menu";
+    let section = sections.find((entry) => entry.name === name);
+    if (!section) {
+      section = {
+        _id: `fallback-${name}`,
+        name,
+        description: "",
+        sectionType: item.isBottleService ? "bottle-service" : "specialty",
+        items: [],
+      };
+      sections.push(section);
+    }
+    section.items.push(item);
+  }
+  return sections;
+}
+
 function renderMenu() {
-  const available = menu
-    .filter((item) => item.isAvailable)
-    .sort((left, right) => {
-      const leftRank = left.isDrinkOfNight ? 0 : left.isFeatured ? 1 : 2;
-      const rightRank = right.isDrinkOfNight ? 0 : right.isFeatured ? 1 : 2;
-      return (
-        leftRank - rightRank || (left.sortOrder || 0) - (right.sortOrder || 0)
-      );
-    });
-  const regularItems = available.filter((item) => !item.isBottleService);
-  const bottleItems = available.filter((item) => item.isBottleService);
-  const categories = [
-    ...new Set(regularItems.map((item) => item.category || "Menu")),
-    ...(bottleItems.length ? ["Bottle Service"] : []),
-  ];
-  if (activeCategory !== "All" && !categories.includes(activeCategory))
-    activeCategory = "All";
-  categoryNav.innerHTML = ["All", ...categories]
+  const sections = catalogSections
+    .map((section) => ({
+      ...section,
+      items: section.items.filter((item) => item.isAvailable),
+    }))
+    .filter((section) => section.items.length);
+  if (
+    activeCategory !== "all" &&
+    !sections.some((section) => String(section._id) === activeCategory)
+  )
+    activeCategory = "all";
+  categoryNav.innerHTML = [
+    { _id: "all", name: "All" },
+    ...sections,
+  ]
     .map(
-      (category) =>
-        `<button type="button" class="${category === activeCategory ? "active" : ""}" data-category="${escapeHtml(category)}" aria-pressed="${category === activeCategory}">${escapeHtml(category)}</button>`,
+      (section) =>
+        `<button type="button" class="${String(section._id) === activeCategory ? "active" : ""}" data-category="${escapeHtml(String(section._id))}" aria-pressed="${String(section._id) === activeCategory}">${escapeHtml(section.name)}</button>`,
     )
     .join("");
   const card = (item) => {
@@ -68,28 +102,26 @@ function renderMenu() {
       ? `Starting at ${money(item.price)}`
       : money(item.price);
     const actionLabel = "Add";
-    return `<article class="menu-card${item.isFeatured ? " is-featured" : ""}${item.isDrinkOfNight ? " drink-of-night" : ""}${item.isCustomDrink ? " custom-drink" : ""}${item.isBottleService ? " bottle-service-card" : ""}"><div class="menu-card-media">${badge}${item.imageUrl ? `<img src="${escapeHtml(item.imageUrl)}" width="800" height="600" loading="lazy" decoding="async" alt="${escapeHtml(item.name)}">` : '<div class="menu-photo-placeholder"><span>Photo coming soon</span></div>'}<button type="button" class="add-button" data-add="${item._id}" aria-label="${actionLabel} ${escapeHtml(item.name)}"><span>${actionLabel}</span><b aria-hidden="true"><svg viewBox="0 0 20 20" focusable="false"><path d="M10 4v12M4 10h12" /></svg></b></button></div><div class="menu-card-body"><div class="menu-card-top"><h3>${escapeHtml(item.name)}</h3><span class="menu-card-price">${priceLabel}</span></div><p>${escapeHtml(item.description)}</p></div></article>`;
+    const typeLabel = itemTypeLabels[item.itemType] || "Menu Item";
+    return `<article class="menu-card${item.isFeatured ? " is-featured" : ""}${item.isDrinkOfNight ? " drink-of-night" : ""}${item.isCustomDrink ? " custom-drink" : ""}${item.isBottleService ? " bottle-service-card" : ""}"><div class="menu-card-media">${badge}${item.imageUrl ? `<img src="${escapeHtml(item.imageUrl)}" width="800" height="600" loading="lazy" decoding="async" alt="${escapeHtml(item.name)}">` : '<div class="menu-photo-placeholder"><span>Photo coming soon</span></div>'}<button type="button" class="add-button" data-add="${item._id}" aria-label="${actionLabel} ${escapeHtml(item.name)}"><span>${actionLabel}</span><b aria-hidden="true"><svg viewBox="0 0 20 20" focusable="false"><path d="M10 4v12M4 10h12" /></svg></b></button></div><div class="menu-card-body"><span class="menu-item-type">${escapeHtml(typeLabel)}</span><div class="menu-card-top"><h3>${escapeHtml(item.name)}</h3><span class="menu-card-price">${priceLabel}</span></div><p>${escapeHtml(item.description)}</p></div></article>`;
   };
-  const visibleRegular =
-    activeCategory === "All"
-      ? regularItems
-      : regularItems.filter(
-          (item) => (item.category || "Menu") === activeCategory,
-        );
-  const visibleBottles =
-    activeCategory === "All" || activeCategory === "Bottle Service"
-      ? bottleItems
-      : [];
-  menuGrid.innerHTML =
-    visibleRegular.length || visibleBottles.length
-      ? `${visibleRegular.length ? `<div class="menu-items-grid">${visibleRegular.map(card).join("")}</div>` : ""}${visibleBottles.length ? `<section class="bottle-service-section"><div class="bottle-service-heading"><p class="eyebrow dark">Reserve the table</p><h2>Bottle Service</h2><span>Choose your bottles, included drinks and chasers.</span></div><div class="menu-items-grid">${visibleBottles.map(card).join("")}</div></section>` : ""}`
-      : '<div class="empty-state">No drinks are available in this category right now.</div>';
+  const visibleSections =
+    activeCategory === "all"
+      ? sections
+      : sections.filter((section) => String(section._id) === activeCategory);
+  const sectionMarkup = (section) => {
+    const bottleService = section.sectionType === "bottle-service";
+    return `<section class="menu-category${bottleService ? " bottle-service-section" : ""}" data-menu-category="${escapeHtml(String(section._id))}"><div class="menu-category-heading${bottleService ? " bottle-service-heading" : ""}"><div><p>${bottleService ? "Reserve the table" : "Explore the menu"}</p><h2>${escapeHtml(section.name)}</h2>${section.description ? `<small class="menu-section-description">${escapeHtml(section.description)}</small>` : ""}</div><span>${section.items.length} item${section.items.length === 1 ? "" : "s"}</span></div><div class="menu-items-grid">${section.items.map(card).join("")}</div></section>`;
+  };
+  menuGrid.innerHTML = visibleSections.length
+      ? visibleSections.map(sectionMarkup).join("")
+      : '<div class="empty-state">No items are available in this public section right now.</div>';
 }
 
 categoryNav.addEventListener("click", (event) => {
   const button = event.target.closest("[data-category]");
   if (!button) return;
-  activeCategory = button.dataset.category;
+  activeCategory = button.dataset.category || "all";
   renderMenu();
 });
 
@@ -402,6 +434,7 @@ document.querySelector("#applyCoupon").addEventListener("click", async () => {
 
 function startLiveData() {
   menu = fallbackMenu;
+  catalogSections = fallbackSectionsFor(fallbackMenu);
   renderMenu();
   renderCart();
   if (!convexClient) {
@@ -412,13 +445,14 @@ function startLiveData() {
   }
   subscriptions.push(
     convexClient.onUpdate(
-      "menuItems:listAvailable",
+      "menuItems:listPublicCatalog",
       {},
-      (nextMenu) => {
-        const nextSignature = JSON.stringify(nextMenu);
+      (nextCatalog) => {
+        const nextSignature = JSON.stringify(nextCatalog);
         if (nextSignature === menuSignature) return;
         menuSignature = nextSignature;
-        menu = nextMenu;
+        catalogSections = nextCatalog?.sections || [];
+        menu = catalogSections.flatMap((section) => section.items);
         renderMenu();
         renderCart();
       },
