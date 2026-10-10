@@ -33,7 +33,7 @@
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Sora:wght@500;600;700;800&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="styles.css?v=20260716-2" />
+    <link rel="stylesheet" href="styles.css?v=20261010-1" />
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -377,6 +377,23 @@
         © 2026 The Patio. All rights reserved. <span>Enjoy responsibly.</span>
       </p>
     </footer>
+    <dialog class="event-reminder" id="eventReminder" aria-labelledby="eventReminderTitle" aria-describedby="eventReminderIntro">
+      <button class="event-reminder-close" type="button" aria-label="Close event reminder" data-dismiss-event autofocus>×</button>
+      <p class="event-reminder-eyebrow">One night at The Patio</p>
+      <h2 id="eventReminderTitle">Nightmare on the Patio</h2>
+      <p id="eventReminderIntro">Bring your most creative costume for a night with DJ Ras T and DJ Shane.</p>
+      <dl class="event-reminder-details">
+        <div><dt>When</dt><dd>Wednesday, October 28, 2026<br><strong>6:00 PM – 1:00 AM</strong><small>Ends Thursday, October 29. All times Eastern.</small></dd></div>
+        <div><dt>Where</dt><dd>The Patio<br>2280 Main Street, Hartford, CT</dd></div>
+        <div><dt>Admission</dt><dd><strong>$10 before 10 PM</strong><br>$15 after 10 PM</dd></div>
+      </dl>
+      <p class="event-reminder-prize"><strong>$200 prize</strong> for the most creative costume</p>
+      <div class="event-reminder-actions">
+        <a class="button" href="events.html#nightmare-on-the-patio" data-dismiss-event>View event details</a>
+        <button type="button" data-dismiss-event>Maybe later</button>
+      </div>
+    </dialog>
     <script src="shared.js?v=20260715-7" defer></script>
+    <script src="event-reminder.js?v=20261010-1" defer></script>
   </body>
 </html>

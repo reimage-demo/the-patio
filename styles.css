@@ -4584,3 +4584,143 @@ body[data-page="contact"] .contact-cards h2 > a:last-child {
     border-radius: 18px;
   }
 }
+
+/* Event flyers stay complete, with the event details available as readable text. */
+body[data-page="events"] .event-card {
+  max-height: none;
+  scroll-margin-top: 110px;
+}
+.event-flyer {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background: #07130d;
+  color: #fff;
+}
+body[data-page="events"] .event-flyer img {
+  height: auto;
+  min-height: 0;
+  aspect-ratio: auto;
+  object-fit: contain;
+}
+.event-flyer span {
+  padding: 10px 16px;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 700;
+}
+body[data-page="events"] .event-description {
+  display: block;
+  overflow: visible;
+  -webkit-line-clamp: unset;
+  white-space: pre-line;
+  font-size: 15px;
+  line-height: 1.65;
+}
+body[data-page="events"] .event-time {
+  font-size: 15px;
+  line-height: 1.6;
+}
+body.event-reminder-open { overflow: hidden; }
+.event-reminder {
+  position: fixed;
+  inset: 0;
+  box-sizing: border-box;
+  width: min(560px, calc(100% - 28px));
+  max-height: calc(100dvh - 28px);
+  margin: auto;
+  padding: 34px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  border: 1px solid #e3d5ba;
+  border-top: 6px solid #eebf57;
+  border-radius: 22px;
+  background: #fffdf8;
+  color: #17251d;
+  box-shadow: 0 24px 90px #0006;
+  font-family: Inter, sans-serif;
+  font-size: 16px;
+  line-height: 1.55;
+}
+.event-reminder::backdrop { background: rgb(4 15 9 / 76%); }
+.event-reminder-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 50%;
+  background: #eee9dd;
+  color: #17251d;
+  font-size: 28px;
+  line-height: 1;
+}
+.event-reminder-eyebrow {
+  margin: 0 34px 12px 0;
+  color: #685021;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+.event-reminder h2 {
+  margin: 0 18px 14px 0;
+  font: 800 clamp(28px, 5vw, 38px)/1.12 Sora, sans-serif;
+  letter-spacing: -.035em;
+}
+.event-reminder #eventReminderIntro { margin: 0 0 22px; color: #47534b; }
+.event-reminder-details { margin: 0; }
+.event-reminder-details > div {
+  display: grid;
+  grid-template-columns: 92px 1fr;
+  gap: 12px;
+  padding: 12px 0;
+  border-top: 1px solid #e0e2d9;
+}
+.event-reminder dt { font-weight: 700; }
+.event-reminder dd { margin: 0; }
+.event-reminder dd small {
+  display: block;
+  margin-top: 4px;
+  font-size: 12px;
+  color: #536057;
+}
+.event-reminder-prize {
+  margin: 12px 0 22px;
+  padding: 14px 16px;
+  background: #f9ebc7;
+  border-radius: 10px;
+  color: #493615;
+}
+.event-reminder-prize strong { display: block; font-size: 22px; }
+.event-reminder-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+.event-reminder-actions .button {
+  flex: 1;
+  min-height: 48px;
+  padding: 12px 18px;
+  background: #143c27;
+  color: #fff;
+  border-radius: 10px;
+  text-align: center;
+  font-size: 14px;
+}
+.event-reminder-actions button {
+  min-height: 48px;
+  padding: 10px 14px;
+  border: 0;
+  background: transparent;
+  color: #35483c;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.event-reminder :focus-visible, .event-flyer:focus-visible {
+  outline: 3px solid #a16b10;
+  outline-offset: 3px;
+}
+@media (max-width: 480px) {
+  .event-reminder { padding: 28px 20px 20px; }
+  .event-reminder-details > div { grid-template-columns: 1fr; gap: 3px; }
+  .event-reminder dt { font-size: 13px; color: #536057; }
+  .event-reminder-actions { flex-direction: column; align-items: stretch; gap: 0; }
+}

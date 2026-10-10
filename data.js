@@ -195,14 +195,14 @@
 
   const fallbackEvents = [
     {
-      _id: "e1",
-      title: "Live Music Night",
-      date: "2026-08-01",
-      startTime: "8:00 PM",
-      endTime: "11:00 PM",
+      _id: "nightmare-on-the-patio",
+      title: "Nightmare on the Patio",
+      date: "2026-10-28",
+      startTime: "6:00 PM",
+      endTime: "1:00 AM (Thursday, October 29)",
       description:
-        "A placeholder event featuring live music, cocktails and an intimate Patio atmosphere. Full artist details coming soon.",
-      imageUrl: "assets/images/patio-lounge.jpg",
+        "Join DJ Ras T and DJ Shane at The Patio, 2280 Main Street, Hartford, CT.\n\nAdmission: $10 before 10 PM; $15 after 10 PM.\n\n$200 prize for the most creative costume. All times Eastern.",
+      imageUrl: "assets/images/nightmare-on-the-patio-2026.jpg",
       isPublished: true,
     },
   ];
