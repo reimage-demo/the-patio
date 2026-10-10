@@ -279,6 +279,89 @@ h2 em {
   background: var(--lime);
   box-shadow: 0 0 0 5px rgba(182, 228, 80, 0.15);
 }
+.visit-section {
+  padding: 56px 7vw;
+  background: var(--paper);
+  scroll-margin-top: 120px;
+}
+.visit-card {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 40px;
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: clamp(40px, 6vw, 96px);
+  border-radius: 24px;
+  background: #edf3ed;
+}
+.visit-details .eyebrow {
+  margin-bottom: 12px;
+  color: #1e7142;
+}
+.visit-details h2 {
+  margin: 0 0 24px;
+  font-size: clamp(26px, 2.4vw, 34px);
+  line-height: 1.2;
+  letter-spacing: -0.04em;
+}
+.visit-details address {
+  margin-bottom: 24px;
+  color: #536057;
+  font-style: normal;
+}
+.visit-details address a {
+  text-decoration: underline;
+  text-decoration-color: #bac7bd;
+  text-underline-offset: 5px;
+}
+.visit-details address a:hover {
+  color: #1e7142;
+}
+.visit-details .visit-phone {
+  display: block;
+  width: fit-content;
+  margin-top: 16px;
+}
+.visit-details > p:not(.eyebrow) {
+  margin-bottom: 8px;
+  color: #536057;
+}
+.visit-hours h3 {
+  margin: 0 0 18px;
+  font-size: 19px;
+  line-height: 1.4;
+  letter-spacing: -0.03em;
+}
+.visit-hours dl {
+  margin: 0;
+}
+.visit-hours dl > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 7px 0;
+}
+.visit-hours dt {
+  color: #536057;
+}
+.visit-hours dd {
+  margin: 0;
+  text-align: right;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+@media (max-width: 760px) {
+  .visit-section {
+    padding: 32px 20px;
+    scroll-margin-top: 100px;
+  }
+  .visit-card {
+    grid-template-columns: 1fr;
+    gap: 32px;
+    padding: 28px 24px;
+    border-radius: 20px;
+  }
+}
 .split-section {
   padding: clamp(85px, 11vw, 155px) 7vw;
   display: grid;
