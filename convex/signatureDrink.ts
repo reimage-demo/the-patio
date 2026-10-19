@@ -49,3 +49,21 @@ export const addBucketRumPunch = internalMutation({
     return { id, sizeId, created: true };
   },
 });
+
+// Publish the approved retouch without touching pricing, options or availability.
+export const useRetouchedPhoto = internalMutation({
+  args: {},
+  handler: async (ctx) => {
+    const item = (await ctx.db.query("menuItems").collect()).find(
+      (row) => row.name.toLowerCase() === "bucket rum punch",
+    );
+    if (!item) throw new Error("Bucket Rum Punch was not found.");
+    const original = "https://thepatioct.com/assets/images/bucket-rum-punch.webp";
+    const retouched = "https://thepatioct.com/assets/images/bucket-rum-punch-v2.webp";
+    if (item.imageStorageId || ![original, retouched].includes(item.imageUrl || ""))
+      throw new Error("The photo was changed in admin; review it before replacing.");
+    if (item.imageUrl === retouched) return { id: item._id, updated: false };
+    await ctx.db.patch(item._id, { imageUrl: retouched, updatedAt: Date.now() });
+    return { id: item._id, updated: true };
+  },
+});

@@ -136,3 +136,10 @@ this product and its pricing group. Publish the image before running it on
 production: `npx convex run signatureDrink:addBucketRumPunch --prod`.
 The existing admin portal reads these records live and needs no separate
 frontend release. Run `npm test` and `npm run typecheck` before publishing.
+
+The October 18 photo retouch is `assets/images/bucket-rum-punch-v2.webp`.
+It was edited with the built-in imagegen tool using the original bucket photo
+and existing Rum Punch/Tropical Storm photos as lighting and style references.
+The exact prompt is saved beside the asset in `bucket-rum-punch-retouch-prompt.txt`.
+Publish that asset, then run `signatureDrink:useRetouchedPhoto --prod` to update
+the shared menu/admin image. The original remains available for rollback.
