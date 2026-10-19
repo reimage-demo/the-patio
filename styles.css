@@ -4888,3 +4888,11 @@ body.event-reminder-open { overflow: hidden; }
   .home-hero .hero-copy > p:not(.eyebrow) { font-size: 14px; }
   .home-hero .button-row { margin-top: 14px; }
 }
+
+/* Subdue the photo behind the centered homepage copy. */
+.home-hero .hero-media { filter: saturate(.65) contrast(.9); }
+.home-hero .hero-shade {
+  background: radial-gradient(ellipse at center, rgba(3, 15, 8, .78) 0%, rgba(3, 15, 8, .68) 55%, rgba(3, 15, 8, .55) 100%);
+}
+.home-hero .hero-copy { text-shadow: 0 2px 14px rgba(0, 0, 0, .35); }
+.home-hero .hero-copy > p:not(.eyebrow) { color: rgba(255, 255, 255, .94); }
