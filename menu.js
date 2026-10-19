@@ -29,44 +29,58 @@ const subscriptions = [];
 function isSignaturePunch(item) {
   return item.name.trim().toLowerCase() === "bucket rum punch";
 }
+const signatureSessionKey = "patio_signature_punch_session_v2";
+const signatureDialog = document.querySelector("#signatureWelcome");
+let signaturePreviousFocus = null;
 function showSignatureWelcome() {
-  const dialog = document.querySelector("#signatureWelcome");
   const item = menu.find(item => isSignaturePunch(item) && item.isAvailable);
-  if (!dialog || !item || !item.imageUrl || typeof dialog.showModal !== "function") return;
-  if (dialog.dataset.shown || document.querySelector("dialog[open]")) return;
-  const storageKey = "patio_signature_punch_seen_v1";
-  try { if (localStorage.getItem(storageKey)) return; } catch {}
-  const previousFocus = document.activeElement;
-  dialog.querySelector("img").src = item.imageUrl;
-  dialog.querySelector("#signaturePrices").textContent = (item.optionGroups || [])
+  if (!signatureDialog || !item?.imageUrl || typeof signatureDialog.showModal !== "function") return;
+  if (document.visibilityState === "hidden" || document.querySelector("dialog[open]")) return;
+  if (signatureDialog.dataset.shown) return;
+  try { if (sessionStorage.getItem(signatureSessionKey)) return; } catch {}
+  signaturePreviousFocus = document.activeElement;
+  signatureDialog.querySelector("img").src = item.imageUrl;
+  signatureDialog.querySelector("#signaturePrices").textContent = (item.optionGroups || [])
     .flatMap(group => group.options.map(option => `${option.name} ${money(item.price + option.price)}`)).join(" · ");
-  const dismiss = () => dialog.close();
-  dialog.querySelectorAll("[data-dismiss-signature]").forEach(button => button.onclick = dismiss);
-  dialog.addEventListener("close", () => {
-    document.body.classList.remove("signature-welcome-open");
-    if (previousFocus instanceof HTMLElement) previousFocus.focus();
-  });
-  dialog.addEventListener("click", event => {
-    if (event.target !== dialog) return;
-    const rect = dialog.getBoundingClientRect();
-    if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) dismiss();
-  });
-  dialog.querySelector("#signatureCta").onclick = () => {
-    dismiss();
+  signatureDialog.querySelector("#signatureCta").onclick = () => {
+    signatureDialog.close();
     const current = menu.find(row => String(row._id) === String(item._id) && row.isAvailable);
     if (!current) return;
     activeCategory = String(catalogSections.find(section => section.items.some(row => String(row._id) === String(current._id)))?._id || "all");
     renderMenu();
     const card = document.getElementById("bucket-rum-punch");
-    card?.scrollIntoView({ behavior: window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "center" });
+    card?.scrollIntoView({ behavior: "auto", block: "center" });
     card?.querySelector("[data-add]")?.focus({ preventScroll: true });
     card?.querySelector("[data-add]")?.click();
   };
-  dialog.showModal();
-  dialog.dataset.shown = "true";
+  signatureDialog.showModal();
+  signatureDialog.dataset.shown = "true";
   document.body.classList.add("signature-welcome-open");
-  try { localStorage.setItem(storageKey, "1"); } catch {}
+  try { sessionStorage.setItem(signatureSessionKey, "1"); } catch {}
 }
+signatureDialog?.querySelectorAll("[data-dismiss-signature]").forEach(button => {
+  button.addEventListener("click", () => signatureDialog.close());
+});
+signatureDialog?.addEventListener("close", () => {
+  document.body.classList.remove("signature-welcome-open");
+  if (signaturePreviousFocus instanceof HTMLElement) signaturePreviousFocus.focus({ preventScroll: true });
+});
+signatureDialog?.addEventListener("click", event => {
+  if (event.target !== signatureDialog) return;
+  const rect = signatureDialog.getBoundingClientRect();
+  if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) signatureDialog.close();
+});
+// Retry after another dialog closes or a background tab becomes visible.
+document.addEventListener("close", () => queueMicrotask(() => showSignatureWelcome()), true);
+document.addEventListener("visibilitychange", () => showSignatureWelcome());
+
+const menuHeader = document.querySelector(".site-header");
+function updateMenuHeaderHeight() {
+  if (menuHeader) document.documentElement.style.setProperty("--menu-header-height", `${Math.ceil(menuHeader.getBoundingClientRect().height)}px`);
+}
+updateMenuHeaderHeight();
+if (menuHeader && typeof ResizeObserver !== "undefined") new ResizeObserver(updateMenuHeaderHeight).observe(menuHeader);
+window.addEventListener("resize", updateMenuHeaderHeight);
 
 function showsStartingPrice(item) {
   if (typeof item.showsStartingPrice === "boolean")
@@ -111,6 +125,7 @@ function fallbackSectionsFor(items) {
 }
 
 function renderMenu() {
+  const filterScroll = categoryNav.scrollLeft;
   const sections = catalogSections
     .map((section) => ({
       ...section,
@@ -131,6 +146,7 @@ function renderMenu() {
         `<button type="button" class="${String(section._id) === activeCategory ? "active" : ""}" data-category="${escapeHtml(String(section._id))}" aria-pressed="${String(section._id) === activeCategory}">${escapeHtml(section.name)}</button>`,
     )
     .join("");
+  categoryNav.scrollLeft = filterScroll;
   const card = (item) => {
     const badge = isSignaturePunch(item)
       ? '<span class="menu-card-badge">Patio Signature</span>'
@@ -168,6 +184,9 @@ categoryNav.addEventListener("click", (event) => {
   if (!button) return;
   activeCategory = button.dataset.category || "all";
   renderMenu();
+  categoryNav.querySelector(".active")?.focus({ preventScroll: true });
+  // Keep newly filtered drinks in view even after scrolling far down a category.
+  menuGrid.scrollIntoView({ behavior: "auto", block: "start" });
 });
 
 menuGrid.addEventListener("click", (event) => {
