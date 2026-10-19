@@ -25,6 +25,49 @@ let appliedCoupon = null;
 let toastTimer;
 const subscriptions = [];
 
+
+function isSignaturePunch(item) {
+  return item.name.trim().toLowerCase() === "bucket rum punch";
+}
+function showSignatureWelcome() {
+  const dialog = document.querySelector("#signatureWelcome");
+  const item = menu.find(item => isSignaturePunch(item) && item.isAvailable);
+  if (!dialog || !item || !item.imageUrl || typeof dialog.showModal !== "function") return;
+  if (dialog.dataset.shown || document.querySelector("dialog[open]")) return;
+  const storageKey = "patio_signature_punch_seen_v1";
+  try { if (localStorage.getItem(storageKey)) return; } catch {}
+  const previousFocus = document.activeElement;
+  dialog.querySelector("img").src = item.imageUrl;
+  dialog.querySelector("#signaturePrices").textContent = (item.optionGroups || [])
+    .flatMap(group => group.options.map(option => `${option.name} ${money(item.price + option.price)}`)).join(" · ");
+  const dismiss = () => dialog.close();
+  dialog.querySelectorAll("[data-dismiss-signature]").forEach(button => button.onclick = dismiss);
+  dialog.addEventListener("close", () => {
+    document.body.classList.remove("signature-welcome-open");
+    if (previousFocus instanceof HTMLElement) previousFocus.focus();
+  });
+  dialog.addEventListener("click", event => {
+    if (event.target !== dialog) return;
+    const rect = dialog.getBoundingClientRect();
+    if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) dismiss();
+  });
+  dialog.querySelector("#signatureCta").onclick = () => {
+    dismiss();
+    const current = menu.find(row => String(row._id) === String(item._id) && row.isAvailable);
+    if (!current) return;
+    activeCategory = String(catalogSections.find(section => section.items.some(row => String(row._id) === String(current._id)))?._id || "all");
+    renderMenu();
+    const card = document.getElementById("bucket-rum-punch");
+    card?.scrollIntoView({ behavior: window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "center" });
+    card?.querySelector("[data-add]")?.focus({ preventScroll: true });
+    card?.querySelector("[data-add]")?.click();
+  };
+  dialog.showModal();
+  dialog.dataset.shown = "true";
+  document.body.classList.add("signature-welcome-open");
+  try { localStorage.setItem(storageKey, "1"); } catch {}
+}
+
 function showsStartingPrice(item) {
   if (typeof item.showsStartingPrice === "boolean")
     return item.showsStartingPrice;
@@ -89,7 +132,9 @@ function renderMenu() {
     )
     .join("");
   const card = (item) => {
-    const badge = item.isBottleService
+    const badge = isSignaturePunch(item)
+      ? '<span class="menu-card-badge">Patio Signature</span>'
+      : item.isBottleService
       ? '<span class="menu-card-badge custom-badge">Bottle Service</span>'
       : item.isDrinkOfNight
         ? '<span class="menu-card-badge night-badge">Drink of the Night</span>'
@@ -101,9 +146,9 @@ function renderMenu() {
     const priceLabel = showsStartingPrice(item)
       ? `Starting at ${money(item.price)}`
       : money(item.price);
-    const actionLabel = "Add";
+    const actionLabel = isSignaturePunch(item) ? "Choose size" : "Add";
     const typeLabel = itemTypeLabels[item.itemType] || "Menu Item";
-    return `<article class="menu-card${item.isFeatured ? " is-featured" : ""}${item.isDrinkOfNight ? " drink-of-night" : ""}${item.isCustomDrink ? " custom-drink" : ""}${item.isBottleService ? " bottle-service-card" : ""}"><div class="menu-card-media">${badge}${item.imageUrl ? `<img src="${escapeHtml(item.imageUrl)}" width="800" height="600" loading="lazy" decoding="async" alt="${escapeHtml(item.name)}">` : '<div class="menu-photo-placeholder"><span>Photo coming soon</span></div>'}<button type="button" class="add-button" data-add="${item._id}" aria-label="${actionLabel} ${escapeHtml(item.name)}"><span>${actionLabel}</span><b aria-hidden="true"><svg viewBox="0 0 20 20" focusable="false"><path d="M10 4v12M4 10h12" /></svg></b></button></div><div class="menu-card-body"><span class="menu-item-type">${escapeHtml(typeLabel)}</span><div class="menu-card-top"><h3>${escapeHtml(item.name)}</h3><span class="menu-card-price">${priceLabel}</span></div><p>${escapeHtml(item.description)}</p></div></article>`;
+    return `<article ${isSignaturePunch(item) ? 'id="bucket-rum-punch"' : ""} class="menu-card${item.isFeatured ? " is-featured" : ""}${item.isDrinkOfNight ? " drink-of-night" : ""}${item.isCustomDrink ? " custom-drink" : ""}${item.isBottleService ? " bottle-service-card" : ""}"><div class="menu-card-media">${badge}${item.imageUrl ? `<img src="${escapeHtml(item.imageUrl)}" width="800" height="600" loading="lazy" decoding="async" alt="${escapeHtml(item.name)}">` : '<div class="menu-photo-placeholder"><span>Photo coming soon</span></div>'}<button type="button" class="add-button" data-add="${item._id}" aria-label="${actionLabel} ${escapeHtml(item.name)}"><span>${actionLabel}</span><b aria-hidden="true"><svg viewBox="0 0 20 20" focusable="false"><path d="M10 4v12M4 10h12" /></svg></b></button></div><div class="menu-card-body"><span class="menu-item-type">${escapeHtml(typeLabel)}</span><div class="menu-card-top"><h3>${escapeHtml(item.name)}</h3><span class="menu-card-price">${priceLabel}</span></div><p>${escapeHtml(item.description)}</p></div></article>`;
   };
   const visibleSections =
     activeCategory === "all"
@@ -222,7 +267,7 @@ function openCustomizer(item) {
       const requirement = group.minSelections
         ? `Choose ${group.minSelections}${group.maxSelections > group.minSelections ? `–${group.maxSelections}` : ""}`
         : `Optional · up to ${group.maxSelections}`;
-      return `<fieldset class="customize-group" data-group-id="${group._id}" data-min="${group.minSelections}" data-max="${group.selectionMode === "single" ? 1 : group.maxSelections}"><legend>${escapeHtml(group.name)} <span>${escapeHtml(requirement)}</span></legend>${group.description ? `<p>${escapeHtml(group.description)}</p>` : ""}<div>${group.options.map((option) => `<label><input type="${inputType}" name="option-group-${groupIndex}" value="${escapeHtml(option.id)}" data-price="${option.price}"><span><strong>${escapeHtml(option.name)}</strong>${option.description ? `<small>${escapeHtml(option.description)}</small>` : ""}</span><b>${option.price ? `+${money(option.price)}` : "Included"}</b></label>`).join("")}</div></fieldset>`;
+      return `<fieldset class="customize-group" data-group-id="${group._id}" data-min="${group.minSelections}" data-max="${group.selectionMode === "single" ? 1 : group.maxSelections}"><legend>${escapeHtml(group.name)} <span>${escapeHtml(requirement)}</span></legend>${group.description ? `<p>${escapeHtml(group.description)}</p>` : ""}<div>${group.options.map((option) => `<label><input type="${inputType}" name="option-group-${groupIndex}" value="${escapeHtml(option.id)}" data-price="${option.price}"><span><strong>${escapeHtml(option.name)}</strong>${option.description ? `<small>${escapeHtml(option.description)}</small>` : ""}</span><b>${group.name === "Size" && group.selectionMode === "single" ? money(item.price + option.price) : option.price ? `+${money(option.price)}` : "Included"}</b></label>`).join("")}</div></fieldset>`;
     })
     .join("");
   document.querySelector("#customizeMessage").textContent = "";
@@ -455,6 +500,7 @@ function startLiveData() {
         menu = catalogSections.flatMap((section) => section.items);
         renderMenu();
         renderCart();
+        showSignatureWelcome();
       },
       (error) => console.warn("Using the local menu preview.", error),
     ),

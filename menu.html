@@ -30,6 +30,7 @@
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Sora:wght@500;600;700;800&display=swap"
       rel="stylesheet"
     />
+    <link rel="stylesheet" href="signature-drink.css?v=20261018-1" />
     <link rel="stylesheet" href="styles.css?v=20260830-2" />
     <script type="application/ld+json">
       {
@@ -161,7 +162,19 @@
       role="status"
       aria-live="polite"
     ></div>
-    <dialog class="checkout-dialog customize-dialog" id="customizeDialog">
+    <dialog class="signature-welcome" id="signatureWelcome" aria-labelledby="signatureTitle" aria-describedby="signatureIntro">
+      <button type="button" class="signature-close" data-dismiss-signature aria-label="Close drink introduction">×</button>
+      <img width="1374" height="1145" alt="The Patio’s red Bucket Rum Punch in its signature bucket" />
+      <div class="signature-copy">
+        <p class="signature-eyebrow">The Patio’s signature drink</p>
+        <h2 id="signatureTitle">Bucket Rum Punch</h2>
+        <p id="signatureIntro">Your next Patio favorite, by the bucket. Pick your size and make yourself at home.</p>
+        <p id="signaturePrices" class="signature-prices"></p>
+        <button type="button" class="button button-primary full" id="signatureCta">Choose your size</button>
+        <button type="button" class="signature-later" data-dismiss-signature>Explore the menu</button>
+      </div>
+    </dialog>
+    <dialog class="checkout-dialog customize-dialog" id="customizeDialog" aria-labelledby="customizeTitle">
       <button class="dialog-close" id="closeCustomize" aria-label="Close">
         <span aria-hidden="true"></span>
       </button>
@@ -308,6 +321,6 @@
     <script src="vendor/convex-client.js?v=20260830-1" defer></script>
     <script src="data.js?v=20260830-1" defer></script>
     <script src="shared.js?v=20260830-1" defer></script>
-    <script src="menu.js?v=20260830-1" defer></script>
+    <script src="menu.js?v=20261018-punch" defer></script>
   </body>
 </html>

@@ -170,7 +170,7 @@ export const prepareHostedCheckout = internalMutation({
       const attached = new Set(attachedIds.map(String));
       const groups = (
         await Promise.all(attachedIds.map((groupId) => ctx.db.get(groupId)))
-      ).filter(Boolean);
+      ).filter((group) => group !== null);
       const requestedByGroup = new Map<string, string[]>();
       const seenSelections = new Set<string>();
       for (const selection of requestedOptions) {
@@ -245,10 +245,11 @@ export const prepareHostedCheckout = internalMutation({
     let couponCode: string | undefined;
     let discount = 0;
     if (args.couponCode?.trim()) {
-      couponCode = normalizeCouponCode(args.couponCode);
+      const normalizedCode = normalizeCouponCode(args.couponCode);
+      couponCode = normalizedCode;
       const coupon = await ctx.db
         .query("coupons")
-        .withIndex("by_code", (q) => q.eq("code", couponCode))
+        .withIndex("by_code", (q) => q.eq("code", normalizedCode))
         .unique();
       if (!coupon?.isActive)
         throw publicError("That discount code is not valid.");

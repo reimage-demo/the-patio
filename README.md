@@ -115,3 +115,24 @@ Admins can create percentage or fixed-dollar discount codes from the **Coupons**
 - Deploy Convex with `npm run convex:deploy`.
 - Publish the repository root directly for the public website; no Vite build or `deploy.yml` is required.
 - Deploy `admin-portal/dist/` separately after running `npm run admin:build`.
+
+## Bucket Rum Punch — October 18, 2026
+
+The featured Bucket Rum Punch lives in Rum with the supplied product photo.
+Its base price is $15.00; the required, single-choice Size pricing group adds
+$0.00 for Small or $10.00 for Large, making the totals $15.00 and $25.00.
+Both sizes are editable through the existing admin menu/pricing-group controls.
+The original $12 Rum Punch remains a separate item.
+
+The menu introduction uses the live catalog and appears once per browser,
+tracked by `patio_signature_punch_seen_v1` in local storage. It is suppressed
+when the drink is unavailable. “Choose your size” selects the drink’s section,
+scrolls to its card, and opens the required size picker. Close, Escape, backdrop,
+and “Explore the menu” dismiss it. Clearing that storage key previews it again.
+The supplied photo is optimized at `assets/images/bucket-rum-punch.webp`.
+
+The idempotent internal mutation `signatureDrink:addBucketRumPunch` adds only
+this product and its pricing group. Publish the image before running it on
+production: `npx convex run signatureDrink:addBucketRumPunch --prod`.
+The existing admin portal reads these records live and needs no separate
+frontend release. Run `npm test` and `npm run typecheck` before publishing.

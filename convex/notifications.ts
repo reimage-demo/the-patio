@@ -28,7 +28,7 @@ export const getOrderDetails = internalQuery({
 
 export const sendOrder = internalAction({
   args: { orderId: v.id("orders") },
-  handler: async (ctx, { orderId }) => {
+  handler: async (ctx, { orderId }): Promise<{ sent: boolean; reason?: string }> => {
     const order = await ctx.runQuery(internal.notifications.getOrderDetails, {
       orderId,
     });

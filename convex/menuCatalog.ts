@@ -1,3 +1,4 @@
+import type { Id } from "./_generated/dataModel";
 import { internalMutation, internalQuery } from "./_generated/server";
 
 type CatalogItem = {
@@ -852,7 +853,7 @@ export const assignGeneratedImages = internalMutation({
       throw new Error("A generated-image item ID was included more than once.");
     const checked = [];
     for (const assignment of generatedImageAssignments) {
-      const item = await ctx.db.get(assignment.id as any);
+      const item = await ctx.db.get(assignment.id as Id<"menuItems">);
       const expectedUrl = generatedImageUrl(assignment.file);
       if (!item)
         throw new Error(`Menu item ${assignment.id} no longer exists.`);
@@ -878,7 +879,7 @@ export const assignGeneratedImages = internalMutation({
       checked.push({ item, expectedUrl });
     }
     for (const assignment of preservedImageAssignments) {
-      const item = await ctx.db.get(assignment.id as any);
+      const item = await ctx.db.get(assignment.id as Id<"menuItems">);
       if (!item)
         throw new Error(`Menu item ${assignment.id} no longer exists.`);
       if (item.name !== assignment.name)
