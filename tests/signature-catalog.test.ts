@@ -35,3 +35,40 @@ test('server rejects missing or multiple sizes and prices each chosen size', asy
     expect((order as any).items[0].selectedAddOns[0].name).toBe(`Size: ${size === 'small' ? 'Small' : 'Large'}`);
   }
 });
+
+test('admin photo and size-price edits reach the public catalog and checkout', async () => {
+  const { t, id, sizeId } = await setup();
+  const sessionToken = 'test-admin-session';
+  await t.run(ctx => ctx.db.insert('adminSessions', {
+    token: sessionToken, username: 'Test admin', createdAt: Date.now(), expiresAt: Date.now() + 60_000,
+  }));
+  const rows = await t.query(api.menuItems.adminList, { sessionToken });
+  const item = rows.find(row => row._id === id)!;
+  expect(item.imageUrl).toContain('bucket-rum-punch.webp');
+  const uploadedPhoto = await t.run(ctx => ctx.storage.store(new Blob(['test photo'], { type: 'image/webp' })));
+  const { _id, _creationTime, createdAt, updatedAt, imageUrl, ...editable } = item;
+  await t.mutation(api.menuItems.update, { sessionToken, id, ...editable, price: 1700, imageStorageId: uploadedPhoto });
+  const groups = await t.query(api.optionGroups.adminList, { sessionToken });
+  const { _id: groupId, _creationTime: groupCreationTime, createdAt: groupCreatedAt, updatedAt: groupUpdatedAt, ...group } = groups.find(row => row._id === sizeId)!;
+  await t.mutation(api.optionGroups.update, {
+    sessionToken, id: groupId, ...group,
+    options: group.options.map(option => ({ ...option, price: option.id === 'large' ? 1200 : 0 })),
+  });
+  const catalog = await t.query(api.menuItems.listPublicCatalog, {});
+  const updated = catalog.sections[0].items[0];
+  const adminItem = (await t.query(api.menuItems.adminList, { sessionToken })).find(row => row._id === id)!;
+  expect(updated.price).toBe(1700);
+  expect(updated.imageUrl).toBe(adminItem.imageUrl);
+  expect(updated.imageUrl).toBeTruthy();
+  expect(updated.imageUrl).not.toBe(imageUrl);
+  expect(adminItem.imageStorageId).toBe(uploadedPhoto);
+  expect(updated.optionGroups[0].options.map(option => updated.price + option.price)).toEqual([1700, 2900]);
+  await expect(t.mutation(internal.signatureDrink.useRetouchedPhoto, {})).rejects.toThrow('photo was changed in admin');
+  const result = await t.mutation(internal.clover.prepareHostedCheckout, {
+    clientRequestId: crypto.randomUUID(), candidateIdempotencyKey: crypto.randomUUID(), customerName: 'Test Guest',
+    phone: '8605550100', email: 'test@example.com', ageConfirmed: true, notes: '', tip: 0,
+    items: [{ menuItemId: id, quantity: 1, selectedOptions: [{ groupId, optionId: 'large' }] }],
+  });
+  const order = await t.run(ctx => ctx.db.get(result.orderId as any));
+  expect((order as any).subtotal).toBe(2900);
+});

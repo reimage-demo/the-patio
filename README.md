@@ -124,11 +124,11 @@ $0.00 for Small or $10.00 for Large, making the totals $15.00 and $25.00.
 Both sizes are editable through the existing admin menu/pricing-group controls.
 The original $12 Rum Punch remains a separate item.
 
-The menu introduction uses the live catalog and appears once per browser,
-tracked by `patio_signature_punch_seen_v1` in local storage. It is suppressed
+The menu introduction uses the live catalog and appears once per browsing session,
+tracked by `patio_signature_punch_session_v2` in session storage. It is suppressed
 when the drink is unavailable. “Choose your size” selects the drink’s section,
 scrolls to its card, and opens the required size picker. Close, Escape, backdrop,
-and “Explore the menu” dismiss it. Clearing that storage key previews it again.
+and “Explore the menu” dismiss it. There is no reopen button.
 The supplied photo is optimized at `assets/images/bucket-rum-punch.webp`.
 
 The idempotent internal mutation `signatureDrink:addBucketRumPunch` adds only
@@ -143,3 +143,15 @@ and existing Rum Punch/Tropical Storm photos as lighting and style references.
 The exact prompt is saved beside the asset in `bucket-rum-punch-retouch-prompt.txt`.
 Publish that asset, then run `signatureDrink:useRetouchedPhoto --prod` to update
 the shared menu/admin image. The original remains available for rollback.
+
+
+Production verification: the public menu and `admin.thepatioct.com` both use
+`judicious-chihuahua-601`. Bucket Rum Punch is stored under Rum with the cleaned-up
+`bucket-rum-punch-v2.webp` photo, a $15 base price, and a required Size group.
+Admins can edit the photo and base price in **Menu → Bucket Rum Punch → Edit**.
+In **Pricing & Options → Size**, Small adds $0 and Large adds $10 to the base price.
+Changing the base price changes both size totals; adjust the size surcharges as
+needed. Uploaded replacement photos are stored in Convex. Saved photo and pricing
+changes feed the public menu, future session introductions, and checkout without
+another website deployment. The retouch migration refuses to overwrite an
+admin-uploaded replacement photo.
