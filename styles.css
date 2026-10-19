@@ -4807,3 +4807,34 @@ body.event-reminder-open { overflow: hidden; }
   .event-reminder dt { font-size: 13px; color: #536057; }
   .event-reminder-actions { flex-direction: column; align-items: stretch; gap: 0; }
 }
+
+/* Center page links independently of the right-hand booking and cart actions. */
+@media (min-width: 981px) {
+  .site-header .main-nav {
+    position: absolute;
+    inset: 0;
+    padding: 0;
+    justify-content: center;
+    pointer-events: none;
+  }
+  .site-header .main-nav > a { pointer-events: auto; }
+  .site-header .main-nav > .nav-cta {
+    position: absolute;
+    top: 50%;
+    right: 4vw;
+    transform: translateY(-50%);
+  }
+  body[data-page="menu"] .site-header .main-nav { padding: 0; }
+  body[data-page="menu"] .site-header .main-nav > .nav-cta {
+    right: calc(4vw + 190px);
+  }
+}
+@media (min-width: 981px) and (max-width: 1180px) {
+  body[data-page="menu"] .site-header .main-nav > .nav-cta {
+    right: calc(4vw + 175px);
+  }
+}
+@media (max-width: 980px) {
+  .site-header .main-nav > a:not(.nav-cta) { text-align: center; }
+  .site-header .main-nav > .nav-cta { align-self: flex-end; }
+}
