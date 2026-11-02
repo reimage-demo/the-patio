@@ -3,5 +3,5 @@ Allow: /
 Disallow: /admin-portal/
 Disallow: /convex/
 
-Sitemap: https://www.thepatiohartford.com/sitemap.xml
+Sitemap: https://thepatioct.com/sitemap.xml
 
